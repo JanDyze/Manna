@@ -31,12 +31,16 @@ export function parseAmount(s: string): number | null {
 const round2 = (n: number) => Math.round(n * 100) / 100
 
 /** How each kind of transaction moves an account's balance. */
+/** Whether an entry moves money in an account. History-only entries (affects_balance = false) don't. */
+export const movesBalance = (t: Pick<Tx, 'affects_balance'>) => t.affects_balance !== false
+
 export function balances(accounts: Account[], txs: Tx[]): Map<string, number> {
   const bal = new Map(accounts.map((a) => [a.id, Number(a.opening_balance)]))
   const add = (id: string | null, n: number) => {
     if (id && bal.has(id)) bal.set(id, round2(bal.get(id)! + n))
   }
   for (const t of txs) {
+    if (!movesBalance(t)) continue
     switch (t.kind) {
       case 'income':
       case 'debt_in':

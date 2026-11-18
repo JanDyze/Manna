@@ -66,6 +66,8 @@ export type Tx = {
   note: string | null
   /** a receipt photo in the private bucket */
   receipt_path?: string | null
+  /** false = history only: a past entry the balances already reflect. Counted in totals, budgets and the tithe, not in balances. */
+  affects_balance?: boolean
   created_at?: string
 }
 

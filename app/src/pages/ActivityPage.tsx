@@ -141,6 +141,7 @@ export function ActivityPage() {
                             </span>
                           )}
                           {sub(t)}
+                          {t.affects_balance === false && ' · history only'}
                         </p>
                       </div>
                       <TxAmount tx={t} />

@@ -46,6 +46,8 @@ export function AddPage() {
   const [toAccountId, setToAccountId] = useState<string | null>(editing?.to_account_id ?? accounts[1]?.id ?? null)
   const [date, setDate] = useState(editing?.occurred_on ?? today())
   const [repeat, setRepeat] = useState(false)
+  // history only: a past entry the balances already include (counts in totals, leaves balances alone)
+  const [history, setHistory] = useState(editing?.affects_balance === false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // the receipt: a new photo picked here, or the one already kept with the entry
@@ -167,6 +169,8 @@ export function AddPage() {
       to_account_id: kind === 'transfer' ? toAccountId : null,
       category_id: kind === 'transfer' || isLoan ? null : categoryId,
       note: note.trim() || null,
+      // only sent when it matters, so rows keep the database default
+      ...((history || editing?.affects_balance === false) && { affects_balance: !history }),
     }
     setBusy(true)
     try {
@@ -192,7 +196,7 @@ export function AddPage() {
         }
       }
       const reaction = kind === 'income' ? 'cheer' : kind === 'giving' ? 'give' : 'nod'
-      toast(editing ? 'Updated' : kind === 'giving' ? `Given · ${peso(value)}` : `Saved · ${peso(value)}`, reaction)
+      toast(editing ? 'Updated' : history ? `Kept for the record · ${peso(value)}` : kind === 'giving' ? `Given · ${peso(value)}` : `Saved · ${peso(value)}`, reaction)
       close()
     } catch (err) {
       setError((err as Error).message)
@@ -362,6 +366,14 @@ export function AddPage() {
             )}
 
             <DateField label="Date" value={date} onChange={(v) => setDate(v || today())} max={addMonths(today(), 12)} presets={[{ label: 'Today', value: today() }, { label: 'Yesterday', value: addDays(today(), -1) }]} />
+
+            <label className="switch">
+              <input type="checkbox" checked={history} onChange={(e) => setHistory(e.target.checked)} />
+              <span className="grow">
+                Already in my balance
+                <span className="hint" style={{ display: 'block' }}>For past entries: counts in this month’s totals, but won’t change the account’s balance</span>
+              </span>
+            </label>
 
             {!editing && kind !== 'transfer' && !isLoan && (
               <label className="switch">
