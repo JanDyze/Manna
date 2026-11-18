@@ -1,0 +1,9 @@
+node_modules
+dist
+*.local
+.env
+.wrangler
+*.log
+.sync/
+_to_delete/
+_incoming/
