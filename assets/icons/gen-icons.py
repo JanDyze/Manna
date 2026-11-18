@@ -32,12 +32,12 @@ icon('plan', '''
 ''', ('.needle', 'ic-turn', .8, '12px 12px', 0))
 
 icon('owed', '''
-<circle cx="5.4" cy="8.2" r="2.3"/>
-<path d="M1.8 18.6c.2-2.8 1.6-4.4 3.6-4.4 1 0 1.8.3 2.4.9"/>
-<circle cx="18.6" cy="8.2" r="2.3"/>
-<path d="M22.2 18.6c-.2-2.8-1.6-4.4-3.6-4.4-1 0-1.8.3-2.4.9"/>
-<g class="coin"><circle class="ic-af" cx="12" cy="13.2" r="3.4"/><path d="M12 11.6v3.2" stroke-width="1.5"/></g>
-''', ('.coin', 'ic-flip', .8, '12px 13.2px', 0))
+<g class="coin"><g transform="rotate(-20 12 11.6)">
+<path d="M5 11.6v2.1a7 4.3 0 0 0 14 0V11.6"/>
+<ellipse class="ic-af" cx="12" cy="11.6" rx="7" ry="4.3"/>
+<path d="M12 10.19Q12.42 11.34 14.28 11.6Q12.42 11.86 12 13.01Q11.58 11.86 9.72 11.6Q11.58 11.34 12 10.19Z" fill="currentColor" stroke="none"/>
+</g></g>
+''', ('.coin', 'ic-toss', 1, '12px 11.6px', 0))
 
 # settings: a gear with the logo's star of provision at its heart; the gear turns one tooth and the star twinkles
 icon('gear', '''
@@ -237,6 +237,7 @@ KEYFRAMES = '''
 @keyframes ic-cog { 0% { transform: rotate(0); } 75% { transform: rotate(52deg); } 100% { transform: rotate(45deg); } }
 @keyframes ic-turn90 { 0% { transform: rotate(0); } 70% { transform: rotate(100deg); } 100% { transform: rotate(90deg); } }
 @keyframes ic-flip { 0%, 100% { transform: translateY(0) scaleX(1); } 25% { transform: translateY(-2.6px) scaleX(.1); } 50% { transform: translateY(-3.2px) scaleX(1); } 75% { transform: translateY(-1.4px) scaleX(.1); } }
+@keyframes ic-toss { 0%, 100% { transform: translateY(0) scaleY(1); } 14% { transform: translateY(.8px) scaleY(.85); } 34% { transform: translateY(-3.8px) scaleY(.1); } 50% { transform: translateY(-4.4px) scaleY(1); } 66% { transform: translateY(-2.6px) scaleY(.1); } 84% { transform: translateY(.4px) scaleY(1); } 92% { transform: translateY(-.3px) scaleY(1); } }
 @keyframes ic-steam { 0% { opacity: 0; transform: translateY(2px); } 35% { opacity: 1; } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes ic-chug { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(.6px, -1.4px); } 40% { transform: translate(1.2px, 0); } 60% { transform: translate(1px, -.8px); } 80% { transform: translate(.4px, 0); } }
 @keyframes ic-flicker { 0%, 100% { opacity: 1; transform: scale(1); } 15% { opacity: .35; } 28% { opacity: 1; transform: scale(1.14); } 42% { opacity: .6; } 56% { opacity: 1; transform: scale(1); } }

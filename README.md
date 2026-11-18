@@ -130,12 +130,23 @@ name it Manna and paste the link. The `mk_` key in the link says whose Manna it 
 (`manna.connector_keys`), it's shown once, and it can be revoked from the same screen (it stops working within a minute).
 Up to 5 links at once. The key also works as `Authorization: Bearer mk_…` for clients that send headers.
 
-**Tools.** Reading: `overview` (start here: balances, this month, tithe, bills due, loans, goals, notes due), `get_setup`
-(account and category names), `list_entries` (filters, totals, `truncated`), `spending_report` (a month by category vs budget
-and last month), `list_bills`, `list_loans`, `list_goals`, `list_notes`. Recording: `add_entry`, `update_entry`, `pay_bill`,
-`record_loan`, `record_loan_payment`, `add_to_goal`, `add_note`, `update_note`. Nothing deletes; a wrong entry is corrected
-with `update_entry` or removed in the app. The server's instructions tell Claude to confirm implied entries and report back
-exactly what it saved.
+**Tools: full access.** Claude can do everything the app can (49 tools).
+
+- Everyday (`tools.ts`): `overview` (start here), `get_setup`, `list_entries`, `spending_report`, `list_bills`, `list_loans`,
+  `list_goals`, `list_notes`, `add_entry`, `update_entry`, `pay_bill`, `record_loan`, `record_loan_payment`, `add_to_goal`,
+  `add_note`, `update_note`.
+- Everything else (`manage.ts`): entries (`get_entry` with a receipt-photo link, `delete_entry`, `remove_receipt_photo`);
+  accounts (`list_accounts`, `add_account`, `update_account`, `delete_account` with `move_entries_to`); categories and budgets
+  (`list_categories`, `add_category`, `update_category`, `delete_category`, `set_budget`); bills (`add_bill`, `update_bill`
+  incl. pause, `delete_bill`); people and loans (`add_person`, `update_person`, `delete_person`, `update_loan` incl. close/reopen,
+  `delete_loan`); goals (`add_goal`, `update_goal`, `delete_goal`, `list_goal_entries`, `update_goal_entry`, `delete_goal_entry`);
+  `delete_note`; `update_settings` (tithe %, currency, setup done); the month-end check (`list_month_checks`,
+  `record_month_check`, `delete_month_check`); and connector links (`list_connector_links`, `update_connector_link` to rename or revoke).
+
+Deletes are permanent and behave like the app's own (deleting a loan deletes its entries; deleting an account needs
+`move_entries_to` when entries use it). They carry MCP's `destructiveHint`, and the server's instructions tell Claude to
+confirm before deleting, to confirm implied entries, and to report back exactly what it saved. Making a new link stays
+in the app, because a key is shown only once.
 
 **How it stays one person's:** the function runs with the service role, and every read and write is pinned to the key's
 owner by `user_id`; the same-owner triggers still refuse a row pointing at someone else's account or category.

@@ -20,8 +20,8 @@
 /* plan: the omer jar, measured out; the gold portion fills up when the tab opens */
 .ic-plan .fill { transform-origin: 12px 20.5px; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .ic-play) .ic-plan .fill { animation: ic-fill 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
-.ic-owed .coin { transform-origin: 12px 13.2px; }
-:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .ic-play) .ic-owed .coin { animation: ic-flip 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-owed .coin { transform-origin: 12px 11.6px; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .ic-play) .ic-owed .coin { animation: ic-toss 1s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-gear .cog { transform-origin: 12px 12px; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .ic-play) .ic-gear .cog { animation: ic-cog 0.7s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-gear .spark { transform-origin: 12px 12px; }
@@ -112,7 +112,7 @@
   :is(a:hover, button:hover) .ic-activity .ln:nth-of-type(4) { animation: ic-draw 0.35s ease-out 0.12s backwards; }
   :is(a:hover, button:hover) .ic-activity .ln:nth-of-type(5) { animation: ic-draw 0.3s ease-out 0.24s backwards; }
   :is(a:hover, button:hover) .ic-plan .needle { animation: ic-turn 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
-  :is(a:hover, button:hover) .ic-owed .coin { animation: ic-flip 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-owed .coin { animation: ic-toss 1s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-gear .cog { animation: ic-cog 0.7s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-gear .spark { animation: ic-twinkle 0.7s cubic-bezier(.3,.7,.4,1) 0.1s both; }
   :is(a:hover, button:hover) .ic-plus .pl { animation: ic-turn90 0.45s cubic-bezier(.3,.7,.4,1) 0s both; }
@@ -163,6 +163,7 @@
 @keyframes ic-cog { 0% { transform: rotate(0); } 75% { transform: rotate(52deg); } 100% { transform: rotate(45deg); } }
 @keyframes ic-turn90 { 0% { transform: rotate(0); } 70% { transform: rotate(100deg); } 100% { transform: rotate(90deg); } }
 @keyframes ic-flip { 0%, 100% { transform: translateY(0) scaleX(1); } 25% { transform: translateY(-2.6px) scaleX(.1); } 50% { transform: translateY(-3.2px) scaleX(1); } 75% { transform: translateY(-1.4px) scaleX(.1); } }
+@keyframes ic-toss { 0%, 100% { transform: translateY(0) scaleY(1); } 14% { transform: translateY(.8px) scaleY(.85); } 34% { transform: translateY(-3.8px) scaleY(.1); } 50% { transform: translateY(-4.4px) scaleY(1); } 66% { transform: translateY(-2.6px) scaleY(.1); } 84% { transform: translateY(.4px) scaleY(1); } 92% { transform: translateY(-.3px) scaleY(1); } }
 @keyframes ic-steam { 0% { opacity: 0; transform: translateY(2px); } 35% { opacity: 1; } 100% { opacity: 1; transform: translateY(0); } }
 @keyframes ic-chug { 0%, 100% { transform: translate(0, 0); } 20% { transform: translate(.6px, -1.4px); } 40% { transform: translate(1.2px, 0); } 60% { transform: translate(1px, -.8px); } 80% { transform: translate(.4px, 0); } }
 @keyframes ic-flicker { 0%, 100% { opacity: 1; transform: scale(1); } 15% { opacity: .35; } 28% { opacity: 1; transform: scale(1.14); } 42% { opacity: .6; } 56% { opacity: 1; transform: scale(1); } }

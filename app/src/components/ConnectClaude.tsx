@@ -72,7 +72,7 @@ export function ConnectClaudeSheet({ onClose }: { onClose: () => void }) {
       <div className="stack">
         <p className="small muted">
           Ask Claude about your money (“how much is left for food?”, “who still owes me?”) or tell it what happened
-          (“paid Meralco 1,850 from BDO”). Claude reads and records your Manna through a private link. It can’t delete anything.
+          (“paid Meralco 1,850 from BDO”). Claude can do anything you can do in Manna through a private link, deleting included; it asks before it deletes.
         </p>
 
         {mock ? (
