@@ -171,6 +171,8 @@ export function AddPage() {
       note: note.trim() || null,
       // only sent when it matters, so rows keep the database default
       ...((history || editing?.affects_balance === false) && { affects_balance: !history }),
+      // moved to another day: it joins that day's top until it's arranged there
+      ...(editing && editing.day_order != null && date !== editing.occurred_on && { day_order: null }),
     }
     setBusy(true)
     try {

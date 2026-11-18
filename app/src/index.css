@@ -255,6 +255,18 @@ h1, h2, h3, p { margin: 0; }
 .amount.give { color: var(--gold-ink); }
 .amount.move { color: var(--ink-2); }
 .day-head { display: flex; justify-content: space-between; padding: 6px 4px 0; }
+.day-head { align-items: center; }
+.day-tools { display: inline-flex; align-items: center; gap: 8px; }
+/* Arrange a day: the grip in the day's header turns into Done */
+.arrange-btn { display: inline-grid; place-items: center; min-width: 32px; height: 28px; padding: 0 8px; margin: -4px -4px -4px 0; border-radius: 99px; border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.arrange-btn:active { background: var(--sand); }
+.arrange-btn.on { background: var(--primary); color: var(--on-primary); padding: 0 14px; }
+.reorder > li { position: relative; background: var(--surface); transition: transform .18s cubic-bezier(.3,.7,.4,1), box-shadow .18s; }
+.reorder > li.lifted { z-index: 2; transition: box-shadow .18s; box-shadow: var(--shadow); border-radius: 12px; }
+.reorder.is-dragging { user-select: none; -webkit-user-select: none; }
+.reorder .grip { display: grid; place-items: center; flex: none; width: 40px; height: 44px; margin: -6px -8px -6px -4px; border: 0; background: none; color: var(--ink-2); cursor: grab; touch-action: none; border-radius: 10px; }
+.reorder .grip:active, .reorder li.lifted .grip { cursor: grabbing; color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .reorder > li { transition: none; } }
 
 /* ---------- the camp scene (Today) ---------- */
 .scene { position: relative; height: 330px; overflow: hidden; margin: 0 0 -8px; isolation: isolate; transition: height .45s cubic-bezier(.3,.8,.3,1); }

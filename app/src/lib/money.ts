@@ -140,9 +140,19 @@ export function tithe(txs: Tx[], categories: Category[], month: string, percent:
 }
 
 /** Day groups for a list of transactions, newest first. */
+/** Order inside one day: entries never arranged come first (newest first), then the arranged ones in their set order. */
+export function withinDay(a: Tx, b: Tx): number {
+  const ao = a.day_order ?? null
+  const bo = b.day_order ?? null
+  if (ao === null && bo === null) return (b.created_at ?? '').localeCompare(a.created_at ?? '')
+  if (ao === null) return -1
+  if (bo === null) return 1
+  return ao - bo || (b.created_at ?? '').localeCompare(a.created_at ?? '')
+}
+
 export function byDay(txs: Tx[]): { day: string; txs: Tx[] }[] {
   const groups = new Map<string, Tx[]>()
-  for (const t of [...txs].sort((a, b) => b.occurred_on.localeCompare(a.occurred_on) || (b.created_at ?? '').localeCompare(a.created_at ?? ''))) {
+  for (const t of [...txs].sort((a, b) => b.occurred_on.localeCompare(a.occurred_on) || withinDay(a, b))) {
     if (!groups.has(t.occurred_on)) groups.set(t.occurred_on, [])
     groups.get(t.occurred_on)!.push(t)
   }

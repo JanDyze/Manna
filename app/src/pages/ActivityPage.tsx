@@ -7,6 +7,8 @@ import { dayLabel, monthLabel, monthOf, shiftMonth, thisMonth } from '../lib/dat
 import { Glyph } from '../components/Glyph'
 import { Mascot } from '../components/Mascot'
 import { TxAmount, txIcon, txTile } from '../components/Bits'
+import { Reorder } from '../components/Reorder'
+import { useToast } from '../components/Toast'
 
 const FILTERS: { key: string; label: string; test: (t: Tx) => boolean }[] = [
   { key: 'all', label: 'All', test: () => true },
@@ -18,12 +20,15 @@ const FILTERS: { key: string; label: string; test: (t: Tx) => boolean }[] = [
 ]
 
 export function ActivityPage() {
-  const { data } = useStore()
+  const { data, update } = useStore()
   const look = useLookups()
+  const toast = useToast()
   const [month, setMonth] = useState(thisMonth())
   const [filter, setFilter] = useState('all')
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(false)
+  /** the day being arranged by dragging */
+  const [arranging, setArranging] = useState<string | null>(null)
 
   const totals = useMemo(() => monthTotals(data.transactions, month), [data.transactions, month])
   const q = query.trim().toLowerCase()
@@ -42,6 +47,41 @@ export function ActivityPage() {
   }, [data.transactions, month, filter, q, look])
   const days = byDay(shown)
   const isNow = month === thisMonth()
+  // a day can only be arranged as a whole: not while searching or filtering
+  const canArrange = !q && filter === 'all'
+
+  /** Save a day's new order: 1 is the top. Only rows whose place changed are written. */
+  async function saveOrder(ids: string[]) {
+    const byId = new Map(data.transactions.map((t) => [t.id, t]))
+    try {
+      await Promise.all(ids.map((id, i) => (byId.get(id)?.day_order === i + 1 ? null : update('transactions', id, { day_order: i + 1 }))))
+    } catch {
+      toast("Couldn't save the new order. Try again.", 'worry')
+    }
+  }
+
+  function content(t: Tx) {
+    return (
+      <>
+        <span className={txTile(t)}>
+          <Glyph name={txIcon(t, t.category_id ? look.category.get(t.category_id) : undefined)} size={20} />
+        </span>
+        <div className="grow">
+          <p className="item-title ellipsis">{title(t)}</p>
+          <p className="item-sub ellipsis">
+            {t.receipt_path && (
+              <span className="has-receipt" style={{ marginLeft: 0, marginRight: 4 }} aria-label="Has a receipt">
+                <Glyph name="receipt" size={13} />
+              </span>
+            )}
+            {sub(t)}
+            {t.affects_balance === false && ' · history only'}
+          </p>
+        </div>
+        <TxAmount tx={t} />
+      </>
+    )
+  }
 
   function title(t: Tx) {
     if (t.note) return t.note
@@ -119,36 +159,39 @@ export function ActivityPage() {
       ) : (
         days.map((g) => {
           const net = g.txs.reduce((s, t) => s + signed(t), 0)
+          const open = canArrange && arranging === g.day
           return (
             <section key={g.day}>
               <div className="day-head">
                 <p className="eyebrow">{dayLabel(g.day)}</p>
-                <span className="small muted num">{net === 0 ? '' : peso(net, { sign: true })}</span>
+                <span className="day-tools">
+                  {!open && <span className="small muted num">{net === 0 ? '' : peso(net, { sign: true })}</span>}
+                  {canArrange && g.txs.length > 1 && (
+                    <button
+                      type="button"
+                      className={`arrange-btn${open ? ' on' : ''}`}
+                      aria-pressed={open}
+                      aria-label={open ? `Done arranging ${dayLabel(g.day)}` : `Arrange ${dayLabel(g.day)}`}
+                      onClick={() => setArranging(open ? null : g.day)}
+                    >
+                      {open ? 'Done' : <Glyph name="grip" size={16} />}
+                    </button>
+                  )}
+                </span>
               </div>
-              <ul className="card flush list" style={{ marginTop: 6 }}>
-                {g.txs.map((t) => (
-                  <li key={t.id}>
-                    <Link to={t.debt_id ? `/owed/${t.debt_id}` : `/add/${t.id}`} className="item">
-                      <span className={txTile(t)}>
-                        <Glyph name={txIcon(t, t.category_id ? look.category.get(t.category_id) : undefined)} size={20} />
-                      </span>
-                      <div className="grow">
-                        <p className="item-title ellipsis">{title(t)}</p>
-                        <p className="item-sub ellipsis">
-                          {t.receipt_path && (
-                            <span className="has-receipt" style={{ marginLeft: 0, marginRight: 4 }} aria-label="Has a receipt">
-                              <Glyph name="receipt" size={13} />
-                            </span>
-                          )}
-                          {sub(t)}
-                          {t.affects_balance === false && ' · history only'}
-                        </p>
-                      </div>
-                      <TxAmount tx={t} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              {open ? (
+                <Reorder items={g.txs} render={content} label={title} onReorder={saveOrder} />
+              ) : (
+                <ul className="card flush list" style={{ marginTop: 6 }}>
+                  {g.txs.map((t) => (
+                    <li key={t.id}>
+                      <Link to={t.debt_id ? `/owed/${t.debt_id}` : `/add/${t.id}`} className="item">
+                        {content(t)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
           )
         })

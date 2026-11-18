@@ -68,6 +68,8 @@ export type Tx = {
   receipt_path?: string | null
   /** false = history only: a past entry the balances already reflect. Counted in totals, budgets and the tithe, not in balances. */
   affects_balance?: boolean
+  /** where it sits within its day once arranged in Activity (1 = top); null = never arranged, shown first, newest first */
+  day_order?: number | null
   created_at?: string
 }
 
