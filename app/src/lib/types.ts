@@ -4,6 +4,8 @@ export type AccountKind = 'cash' | 'bank' | 'ewallet' | 'card' | 'savings'
 export type CategoryKind = 'expense' | 'income' | 'giving'
 export type TxKind = CategoryKind | 'transfer' | 'debt_out' | 'debt_in'
 export type Frequency = 'weekly' | 'monthly' | 'yearly'
+/** A bill's kind: a category kind, or 'transfer' for a card payment (bank or e-wallet → card / pay-later account) */
+export type BillKind = CategoryKind | 'transfer'
 export type Direction = 'owed_to_me' | 'i_owe'
 
 export type Settings = { user_id: string; currency: string; tithe_percent: number; onboarded_at: string | null }
@@ -42,15 +44,19 @@ export type GoalEntry = { id: string; goal_id: string; amount: number; occurred_
 export type Recurring = {
   id: string
   title: string
-  kind: CategoryKind
+  kind: BillKind
   amount: number
   account_id: string | null
+  /** card payments: the card or pay-later account the money goes to */
+  to_account_id?: string | null
   category_id: string | null
   frequency: Frequency
   every: number
   next_due: string
   active: boolean
   note: string | null
+  /** payments still to make; counts down when paid and the bill finishes at 0. null = it doesn't end */
+  payments_left?: number | null
 }
 
 export type Tx = {

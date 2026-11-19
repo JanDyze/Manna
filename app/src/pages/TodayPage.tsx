@@ -6,7 +6,7 @@ import { balances, debtLeft, goalSaved, monthPlan, monthTotals, peso, tithe, upc
 import { daysBetween, dueLabel, fmtDate, fromISODate, greeting, monthLabel, shortDate, thisMonth, today } from '../lib/dates'
 import { demoHour, mock } from '../lib/mock'
 import { mood, verseOfTheDay } from '../lib/words'
-import { payBill } from '../lib/actions'
+import { paidMessage, payBill } from '../lib/actions'
 import { Scene } from '../components/Scene'
 import { Mascot } from '../components/Mascot'
 import { EyeToggle, Secret } from '../components/Secret'
@@ -107,8 +107,8 @@ export function TodayPage() {
     if (!bill) return
     setPaying(id)
     try {
-      await payBill(store, bill)
-      toast(`${bill.title} paid · ${peso(bill.amount)}`, 'happy')
+      const { left } = await payBill(store, bill)
+      toast(paidMessage(bill, bill.amount, left), left === 0 ? 'cheer' : 'happy')
     } catch (e) {
       toast((e as Error).message, 'worry')
     } finally {
@@ -245,7 +245,7 @@ export function TodayPage() {
                 const days = daysBetween(t, b.next_due)
                 return (
                   <li key={b.id} className="item">
-                    <Tile icon={data.categories.find((c) => c.id === b.category_id)?.icon ?? 'calendar'} tone={days <= 0 ? 'bad' : undefined} />
+                    <Tile icon={b.kind === 'transfer' ? 'card' : data.categories.find((c) => c.id === b.category_id)?.icon ?? 'calendar'} tone={days <= 0 ? 'bad' : undefined} />
                     <div className="grow">
                       <p className="item-title ellipsis">{b.title}</p>
                       <p className={`item-sub${days < 0 ? ' bad' : ''}`}>{shortDate(b.next_due)} · {dueLabel(b.next_due)}</p>

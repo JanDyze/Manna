@@ -4,7 +4,7 @@ import { peso } from '../lib/money'
 import { Glyph } from './Glyph'
 
 export const ACCOUNT_ICON: Record<Account['kind'], string> = { cash: 'wallet', bank: 'bank', ewallet: 'phone', card: 'card', savings: 'piggy' }
-export const ACCOUNT_KIND_LABEL: Record<Account['kind'], string> = { cash: 'Cash', bank: 'Bank', ewallet: 'E-wallet', card: 'Credit card', savings: 'Savings' }
+export const ACCOUNT_KIND_LABEL: Record<Account['kind'], string> = { cash: 'Cash', bank: 'Bank', ewallet: 'E-wallet', card: 'Card / pay later', savings: 'Savings' }
 
 export function Bar({ pct, tone, thick, label }: { pct: number; tone?: 'gold' | 'good' | 'bad'; thick?: boolean; label?: string }) {
   const w = Math.max(0, Math.min(100, pct))

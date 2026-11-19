@@ -42,8 +42,9 @@ export function mockData(): Data {
     { id: id('acc'), name: 'Wallet', kind: 'cash', opening_balance: 1800, sort: 0, archived: false },
     { id: id('acc'), name: 'GCash', kind: 'ewallet', opening_balance: 4800, sort: 1, archived: false },
     { id: id('acc'), name: 'BDO', kind: 'bank', opening_balance: 9500, sort: 2, archived: false },
+    { id: id('acc'), name: 'Atome', kind: 'card', opening_balance: -2000, sort: 3, archived: false },
   ]
-  const [wallet, gcash, bank] = accounts
+  const [wallet, gcash, bank, atome] = accounts
   // a brand-new user starts with the defaults and nothing in them yet
   // (like the real defaults: Wallet and GCash only; setup asks which bank)
   if (s === 'new') {
@@ -145,6 +146,7 @@ export function mockData(): Data {
     { id: id('rec'), title: 'Meralco', kind: 'expense', amount: 1850, account_id: gcash.id, category_id: c('Bills'), frequency: 'monthly', every: 1, next_due: d(6), active: true, note: null },
     { id: id('rec'), title: 'Netflix', kind: 'expense', amount: 549, account_id: bank.id, category_id: c('Subscriptions'), frequency: 'monthly', every: 1, next_due: d(10), active: true, note: null },
     { id: id('rec'), title: 'PLDT Fiber', kind: 'expense', amount: 1699, account_id: bank.id, category_id: c('Bills'), frequency: 'monthly', every: 1, next_due: d(15), active: true, note: null },
+    { id: id('rec'), title: 'Atome', kind: 'transfer', amount: 1000, account_id: gcash.id, to_account_id: atome.id, category_id: null, frequency: 'monthly', every: 1, next_due: d(4), active: true, note: null, payments_left: 2 },
     { id: id('rec'), title: 'Salary', kind: 'income', amount: 19000, account_id: bank.id, category_id: c('Salary', 'income'), frequency: 'monthly', every: 1, next_due: d(13), active: true, note: '15th and 30th' },
   ]
 

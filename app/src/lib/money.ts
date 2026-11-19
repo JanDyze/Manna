@@ -122,6 +122,14 @@ export function frequencyLabel(r: Pick<Recurring, 'frequency' | 'every'>): strin
   return r.every === 1 ? `Every ${unit}` : `Every ${r.every} ${unit}s`
 }
 
+/** "3 payments left", "Last payment", "Finished", or '' for a bill that doesn't end. */
+export function paymentsLeftLabel(r: Pick<Recurring, 'payments_left'>): string {
+  const n = r.payments_left
+  if (n == null) return ''
+  if (n <= 0) return 'Finished'
+  return n === 1 ? 'Last payment' : `${n} payments left`
+}
+
 /** Active bills due within `days` (late ones included), soonest first. */
 export function upcoming(recurring: Recurring[], days = 30, on = today()): Recurring[] {
   const until = addDays(on, days)
