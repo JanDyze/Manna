@@ -44,6 +44,21 @@ icon('pizza', `
 <path d="M4.8 7.8a15 15 0 0 1 14.4 0"/>
 `, ['', 'ic-swing', 0.8, '12px 21px', 0])
 
+icon('hotcoffee', `
+<path class="steam" d="M10.2 4.4c-.8-.8.7-1.6-.1-2.8"/>
+<path class="steam" d="M13.8 4.4c-.8-.8.7-1.6-.1-2.8"/>
+<path class="ic-a" d="M7.45 11.6h9.1l-.42 4.6H7.87Z"/>
+<path d="M7 8h10l-1.2 12.2a1.4 1.4 0 0 1-1.4 1.2H9.6a1.4 1.4 0 0 1-1.4-1.2ZM6.2 8h11.6l-.6-2.2H6.8Z"/>
+`, ['.steam:nth-of-type(1)', 'ic-steam', 0.9, null, 0], ['.steam:nth-of-type(2)', 'ic-steam', 0.9, null, 0.18])
+
+icon('icedcoffee', `
+<path class="ic-a fill" d="M7.6 12.8h8.8l-.82 7.1a1 1 0 0 1-1 .9H9.42a1 1 0 0 1-1-.9Z"/>
+<rect class="ice" x="8.7" y="10" width="2.7" height="2.7" rx=".6" transform="rotate(-14 10.05 11.35)"/>
+<rect class="ice" x="12.4" y="10.6" width="2.5" height="2.5" rx=".6" transform="rotate(16 13.65 11.85)"/>
+<path d="M6.8 8.4h10.4l-1.3 11.6a1.6 1.6 0 0 1-1.6 1.4H9.7a1.6 1.6 0 0 1-1.6-1.4ZM6.2 8.4c0-1.1.8-1.8 2-1.8h7.6c1.2 0 2 .7 2 1.8Z"/>
+<path class="straw" d="M13.4 6.6 15 1.8h2.2"/>
+`, ['.ice:nth-of-type(1)', 'ic-hop', 0.6, null, 0], ['.ice:nth-of-type(2)', 'ic-hop', 0.6, null, 0.12], ['.fill', 'ic-fill', 0.8, '12px 20.8px', 0])
+
 icon('milktea', `
 <path d="M6.4 8.2h11.2l-1.4 11.6a1.6 1.6 0 0 1-1.6 1.4H9.4a1.6 1.6 0 0 1-1.6-1.4Z"/>
 <path d="M5.4 8.2h13.2M7.4 8.2a4.6 3 0 0 1 9.2 0"/>
@@ -114,9 +129,12 @@ icon('bus', `
 `, ['', 'ic-chug', 0.8, '12px 20px', 0])
 
 icon('motor', `
-<circle cx="5.6" cy="16.4" r="3"/><circle cx="18.4" cy="16.4" r="3"/>
-<path d="M5.6 16.4 9 10.4h5.4l4 6M14.4 10.4l-1.6-3.4h2.6"/>
-<path class="ic-a" d="M8.4 8.6h5.2l-.6 1.8H8.9Z"/>
+<path class="ic-a" d="M4.6 11.4c0-1.3.7-2.2 1.9-2.2h.5c.5 0 .9.3 1.1.7l.3.6h3.6a.95.95 0 0 1 0 1.9H4.6Z"/>
+<path d="M2.8 15.2c-.3-2.4.9-3.8 3-3.8h5.6l1.2 3.4h1.6M8.6 15.2h5.8"/>
+<path d="M14.4 15.2 16 9c.4-1.2 1.6-1.7 2.7-1 1.3.9 2 2.8 2 4.8v2.4"/>
+<path d="M16.5 8.3 17.3 4l2-.6M15 6.2h2.4"/>
+<circle class="ic-a" cx="19" cy="10.6" r=".9"/>
+<circle class="ic-af" cx="5.8" cy="17.4" r="2.3"/><circle class="ic-af" cx="18.6" cy="17.4" r="2.3"/>
 `, ['', 'ic-chug', 0.8, '12px 19px', 0])
 
 icon('bike', `
@@ -573,7 +591,7 @@ const KEYFRAMES = `
 
 // ---------- the icon picker's groups: the original set and this one together ----------
 export const GROUPS = [
-  ['Food & drink', ['food', 'rice', 'noodles', 'burger', 'pizza', 'bread', 'egg', 'fish', 'apple', 'cake', 'icecream', 'coffee', 'milktea', 'drink', 'basket', 'cart']],
+  ['Food & drink', ['food', 'rice', 'noodles', 'burger', 'pizza', 'bread', 'egg', 'fish', 'apple', 'cake', 'icecream', 'coffee', 'hotcoffee', 'icedcoffee', 'milktea', 'drink', 'basket', 'cart']],
   ['Getting around', ['transport', 'jeep', 'bus', 'motor', 'bike', 'car', 'train', 'boat', 'plane', 'fuel', 'pin']],
   ['Home & bills', ['home', 'bolt', 'water', 'wifi', 'flame', 'bulb', 'plug', 'phone', 'tv', 'key', 'sofa', 'laundry', 'fan', 'paid', 'date', 'repeat', 'tool']],
   ['Shopping & care', ['bag', 'shirt', 'shoe', 'tag', 'box', 'beauty', 'scissors', 'gem', 'gift']],

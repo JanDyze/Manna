@@ -44,6 +44,16 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-burger .top { animation: ic-hop 0.65s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-pizza > .ic-body { transform-origin: 12px 21px; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-pizza > .ic-body { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-hotcoffee .steam:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(1) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-hotcoffee .steam:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.18s both; }
+.ic-icedcoffee .ice:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .ice:nth-of-type(1) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-icedcoffee .ice:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .ice:nth-of-type(2) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0.12s both; }
+.ic-icedcoffee .fill { transform-origin: 12px 20.8px; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .fill { animation: ic-fill 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-milktea .pearl:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-milktea .pearl:nth-of-type(1) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-milktea .pearl:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
@@ -323,6 +333,11 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
   :is(a:hover, button:hover) .ic-noodles .lift { animation: ic-hop 0.7s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-burger .top { animation: ic-hop 0.65s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-pizza > .ic-body { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(1) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.18s both; }
+  :is(a:hover, button:hover) .ic-icedcoffee .ice:nth-of-type(1) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-icedcoffee .ice:nth-of-type(2) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0.12s both; }
+  :is(a:hover, button:hover) .ic-icedcoffee .fill { animation: ic-fill 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-milktea .pearl:nth-of-type(1) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-milktea .pearl:nth-of-type(2) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0.1s both; }
   :is(a:hover, button:hover) .ic-milktea .pearl:nth-of-type(3) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0.2s both; }
@@ -474,7 +489,7 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 @keyframes ic-turnkey { 0%, 100% { transform: rotate(0); } 40% { transform: rotate(-28deg); } 70% { transform: rotate(4deg); } }
 
 </style></head><body><main>
-<h1>Manna stickers</h1><p>93 more icons in Manna's family: navy strokes, a gold accent, and a little move each. Tap one to play it; they also take turns on their own.</p>
+<h1>Manna stickers</h1><p>95 more icons in Manna's family: navy strokes, a gold accent, and a little move each. Tap one to play it; they also take turns on their own.</p>
 <label><input type="checkbox" id="dk"> Night</label>
 <h2>Food & drink</h2><div class="grid"><button type="button" class="cell"><svg class="ic ic-rice" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><path class="ic-a" d="M6 11.5c.6-2.6 3-4.2 6-4.2s5.4 1.6 6 4.2Z"/>
 <path d="M3.6 11.5h16.8a8.4 7.4 0 0 1-16.8 0Z"/>
@@ -498,7 +513,14 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 <path d="M12 12V8.2"/>
 <path class="ic-af flame" d="M12 3.2c1.3 1.2 1.4 2.6 0 3.6-1.4-1-1.3-2.4 0-3.6Z"/></svg><span>cake</span></button><button type="button" class="cell"><svg class="ic ic-icecream" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M7.8 11.4 12 21.2l4.2-9.8M9.2 14.6h5.6"/>
 <path class="ic-af scoop" d="M7.6 11.4a4.4 4.4 0 1 1 8.8 0Z"/>
-<circle cx="12" cy="5.4" r="1" fill="currentColor" stroke="none"/></svg><span>icecream</span></button><button type="button" class="cell"><svg class="ic ic-milktea" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M6.4 8.2h11.2l-1.4 11.6a1.6 1.6 0 0 1-1.6 1.4H9.4a1.6 1.6 0 0 1-1.6-1.4Z"/>
+<circle cx="12" cy="5.4" r="1" fill="currentColor" stroke="none"/></svg><span>icecream</span></button><button type="button" class="cell"><svg class="ic ic-hotcoffee" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="steam" d="M10.2 4.4c-.8-.8.7-1.6-.1-2.8"/>
+<path class="steam" d="M13.8 4.4c-.8-.8.7-1.6-.1-2.8"/>
+<path class="ic-a" d="M7.45 11.6h9.1l-.42 4.6H7.87Z"/>
+<path d="M7 8h10l-1.2 12.2a1.4 1.4 0 0 1-1.4 1.2H9.6a1.4 1.4 0 0 1-1.4-1.2ZM6.2 8h11.6l-.6-2.2H6.8Z"/></svg><span>hotcoffee</span></button><button type="button" class="cell"><svg class="ic ic-icedcoffee" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="ic-a fill" d="M7.6 12.8h8.8l-.82 7.1a1 1 0 0 1-1 .9H9.42a1 1 0 0 1-1-.9Z"/>
+<rect class="ice" x="8.7" y="10" width="2.7" height="2.7" rx=".6" transform="rotate(-14 10.05 11.35)"/>
+<rect class="ice" x="12.4" y="10.6" width="2.5" height="2.5" rx=".6" transform="rotate(16 13.65 11.85)"/>
+<path d="M6.8 8.4h10.4l-1.3 11.6a1.6 1.6 0 0 1-1.6 1.4H9.7a1.6 1.6 0 0 1-1.6-1.4ZM6.2 8.4c0-1.1.8-1.8 2-1.8h7.6c1.2 0 2 .7 2 1.8Z"/>
+<path class="straw" d="M13.4 6.6 15 1.8h2.2"/></svg><span>icedcoffee</span></button><button type="button" class="cell"><svg class="ic ic-milktea" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M6.4 8.2h11.2l-1.4 11.6a1.6 1.6 0 0 1-1.6 1.4H9.4a1.6 1.6 0 0 1-1.6-1.4Z"/>
 <path d="M5.4 8.2h13.2M7.4 8.2a4.6 3 0 0 1 9.2 0"/>
 <path d="M12.8 5.4 14.6 1.8"/>
 <circle class="ic-a pearl" cx="9.8" cy="18" r="1.05"/><circle class="ic-a pearl" cx="12.4" cy="18.4" r="1.05"/><circle class="ic-a pearl" cx="14.2" cy="16.4" r="1.05"/></svg><span>milktea</span></button><button type="button" class="cell"><svg class="ic ic-drink" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="ic-a fill" d="M6.9 11h10.2l-.9 8.4a1 1 0 0 1-1 .9H8.8a1 1 0 0 1-1-.9Z"/>
@@ -510,9 +532,12 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 <path class="ic-a" d="M15.2 4.4l1.4-2 .6 2.2Z"/>
 <circle class="ic-af" cx="7" cy="16.6" r="1.9"/><circle class="ic-af" cx="17" cy="16.6" r="1.9"/></g></svg><span>jeep</span></button><button type="button" class="cell"><svg class="ic ic-bus" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><rect class="ic-a" x="6.6" y="5.8" width="10.8" height="4.6" rx="1"/>
 <rect x="4.4" y="3.4" width="15.2" height="14.2" rx="2.6"/>
-<path d="M7.6 14.2h.01M16.4 14.2h.01M7 17.6v2.4M17 17.6v2.4"/></g></svg><span>bus</span></button><button type="button" class="cell"><svg class="ic ic-motor" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><circle cx="5.6" cy="16.4" r="3"/><circle cx="18.4" cy="16.4" r="3"/>
-<path d="M5.6 16.4 9 10.4h5.4l4 6M14.4 10.4l-1.6-3.4h2.6"/>
-<path class="ic-a" d="M8.4 8.6h5.2l-.6 1.8H8.9Z"/></g></svg><span>motor</span></button><button type="button" class="cell"><svg class="ic ic-bike" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><circle cx="5.6" cy="16.4" r="3.2"/><circle cx="18.4" cy="16.4" r="3.2"/>
+<path d="M7.6 14.2h.01M16.4 14.2h.01M7 17.6v2.4M17 17.6v2.4"/></g></svg><span>bus</span></button><button type="button" class="cell"><svg class="ic ic-motor" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><path class="ic-a" d="M4.6 11.4c0-1.3.7-2.2 1.9-2.2h.5c.5 0 .9.3 1.1.7l.3.6h3.6a.95.95 0 0 1 0 1.9H4.6Z"/>
+<path d="M2.8 15.2c-.3-2.4.9-3.8 3-3.8h5.6l1.2 3.4h1.6M8.6 15.2h5.8"/>
+<path d="M14.4 15.2 16 9c.4-1.2 1.6-1.7 2.7-1 1.3.9 2 2.8 2 4.8v2.4"/>
+<path d="M16.5 8.3 17.3 4l2-.6M15 6.2h2.4"/>
+<circle class="ic-a" cx="19" cy="10.6" r=".9"/>
+<circle class="ic-af" cx="5.8" cy="17.4" r="2.3"/><circle class="ic-af" cx="18.6" cy="17.4" r="2.3"/></g></svg><span>motor</span></button><button type="button" class="cell"><svg class="ic ic-bike" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><circle cx="5.6" cy="16.4" r="3.2"/><circle cx="18.4" cy="16.4" r="3.2"/>
 <path d="M5.6 16.4 9.4 9h6.2l2.8 7.4M9.4 9l3.4 7.4H5.6M15.6 9l-1-2.6h2.2M7.8 6.6h3"/>
 <circle class="ic-a" cx="12.8" cy="16.4" r="1.3"/></g></svg><span>bike</span></button><button type="button" class="cell"><svg class="ic ic-car" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><rect class="ic-a sign" x="10" y="3.4" width="4" height="2.2" rx=".6"/>
 <path d="M3 16.4v-3.2c0-.9.5-1.6 1.3-1.9l1.6-3.4A2 2 0 0 1 7.7 6.8h8.6a2 2 0 0 1 1.8 1.1l1.6 3.4c.8.3 1.3 1 1.3 1.9v3.2Z"/>

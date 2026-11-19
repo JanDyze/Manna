@@ -11,6 +11,16 @@
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-burger .top { animation: ic-hop 0.65s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-pizza > .ic-body { transform-origin: 12px 21px; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-pizza > .ic-body { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-hotcoffee .steam:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(1) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-hotcoffee .steam:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.18s both; }
+.ic-icedcoffee .ice:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .ice:nth-of-type(1) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-icedcoffee .ice:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .ice:nth-of-type(2) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0.12s both; }
+.ic-icedcoffee .fill { transform-origin: 12px 20.8px; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .fill { animation: ic-fill 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-milktea .pearl:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-milktea .pearl:nth-of-type(1) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-milktea .pearl:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
@@ -290,6 +300,11 @@
   :is(a:hover, button:hover) .ic-noodles .lift { animation: ic-hop 0.7s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-burger .top { animation: ic-hop 0.65s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-pizza > .ic-body { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(1) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.18s both; }
+  :is(a:hover, button:hover) .ic-icedcoffee .ice:nth-of-type(1) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-icedcoffee .ice:nth-of-type(2) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0.12s both; }
+  :is(a:hover, button:hover) .ic-icedcoffee .fill { animation: ic-fill 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-milktea .pearl:nth-of-type(1) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-milktea .pearl:nth-of-type(2) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0.1s both; }
   :is(a:hover, button:hover) .ic-milktea .pearl:nth-of-type(3) { animation: ic-hop 0.55s cubic-bezier(.3,.7,.4,1) 0.2s both; }
