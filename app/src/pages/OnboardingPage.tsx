@@ -251,7 +251,7 @@ export function OnboardingPage({ again = false }: { again?: boolean }) {
             </ul>
             {accounts.some((a) => a.on && a.kind === 'card') && <p className="small muted">For a credit card, type what you owe on it.</p>}
             <div className="onb-banks">
-              <p className="onb-sub">Which banks or e-wallets do you use? <span className="muted">Tap any that apply.</span></p>
+              <p className="onb-sub">Which banks, e-wallets or pay-later do you use? <span className="muted">Tap any that apply.</span></p>
               <div className="chips" role="group" aria-label="Banks">
                 {BANKS.map((b) => (
                   <button type="button" key={b.name} className="chip brand-chip" aria-pressed={isPicked(b.name) || accounts.some((a) => !a.picked && a.on && brandFor(a.name)?.key === b.key)} onClick={() => togglePick(b)}>

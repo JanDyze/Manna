@@ -21,5 +21,7 @@ The logos are trademarks of their owners. Manna shows them only to label the per
 | `cimb.svg` | CIMB | https://commons.wikimedia.org/wiki/File:CIMB_Group_Logo.svg |
 | `maribank.svg` | MariBank | https://www.maribank.sg (logo_text.svg from the site; symbol only) |
 | `wise.svg` | Wise | Simple Icons (simple-icons npm package), the Wise mark; original wordmark from https://commons.wikimedia.org/wiki/File:Wise_Logo_512x124.svg |
+| `atome.svg` | Atome | https://www.atome.ph (the site's header logo; symbol only, on Atome's #F0FF5F yellow) |
+| `spaylater.svg` | SPayLater | ShopeePay brand guidelines, https://product.shopeepay.co.id/products/brand-guidelines (spaylater-wallet.svg; white on Shopee orange #EE4D2D, set a little off centre as the guidelines ask) |
 
 `raw/` keeps the original files as downloaded. The tiles are made by `make-tiles.py` (Wikimedia Commons SVGs → square tiles).

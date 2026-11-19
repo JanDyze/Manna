@@ -18,6 +18,8 @@ import seabank from '../assets/banks/seabank.svg'
 import cimb from '../assets/banks/cimb.svg'
 import maribank from '../assets/banks/maribank.svg'
 import wise from '../assets/banks/wise.svg'
+import atome from '../assets/banks/atome.svg'
+import spaylater from '../assets/banks/spaylater.svg'
 
 export type Brand = { key: string; name: string; kind: AccountKind; logo: string; match: RegExp }
 
@@ -38,6 +40,8 @@ export const BRANDS: Brand[] = [
   { key: 'cimb', name: 'CIMB', kind: 'bank', logo: cimb, match: /\bcimb\b/i },
   { key: 'maribank', name: 'MariBank', kind: 'bank', logo: maribank, match: /mari ?bank/i },
   { key: 'wise', name: 'Wise', kind: 'ewallet', logo: wise, match: /\bwise\b/i },
+  { key: 'atome', name: 'Atome', kind: 'card', logo: atome, match: /\batome\b/i },
+  { key: 'spaylater', name: 'SPayLater', kind: 'card', logo: spaylater, match: /s ?pay ?later|shopee ?pay ?later/i },
 ]
 
 /** The brand an account is named after, if any ("BDO Savings" → BDO). */
