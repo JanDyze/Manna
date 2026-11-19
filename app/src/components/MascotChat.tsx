@@ -11,6 +11,7 @@ import { Glyph } from './Glyph'
 import { useToast } from './Toast'
 import { PickPhoto, Thumb } from './Photo'
 import type { Photo } from '../lib/photos'
+import { Sheet, type SheetHandle } from './Sheet'
 
 const TRIES = ['Lunch 180 GCash', 'Sweldo 25k to BDO', 'Tithe 2,500', 'Lent 500 to Ana', 'Take note: Jonathan asked if I could help with his father’s meds, not yet', 'What notes do I have?']
 
@@ -42,6 +43,7 @@ export function MascotChat({ onClose, photo: startPhoto }: { onClose: () => void
   const end = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLInputElement>(null)
   const rec = useRef<Recognition | null>(null)
+  const sheet = useRef<SheetHandle>(null)
   const started = useRef(false)
 
   // opened from "Snap a receipt": send the photo straight away
@@ -55,15 +57,11 @@ export function MascotChat({ onClose, photo: startPhoto }: { onClose: () => void
   useEffect(() => {
     end.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [lines, busy])
+  // the sheet answers Escape; the message box gets the focus
   useEffect(() => {
-    const key = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', key)
     input.current?.focus({ preventScroll: true })
-    return () => {
-      document.removeEventListener('keydown', key)
-      rec.current?.stop()
-    }
-  }, [onClose])
+    return () => rec.current?.stop()
+  }, [])
 
   async function send(message: string, photo?: Photo) {
     const m = message.trim()
@@ -134,23 +132,38 @@ export function MascotChat({ onClose, photo: startPhoto }: { onClose: () => void
     void send(text)
   }
 
-  return (
-    <>
-      <div className="sheet-backdrop" onClick={onClose} />
-      <div className="sheet chat" role="dialog" aria-modal="true" aria-label="Talk to KATY">
-        <div className="sheet-grip" />
-        <header className={`chat-head${talking ? ' is-talking' : ''}`}>
-          <Mascot action={mood} size={64} />
-          <div className="grow">
-            <h2>Tell KATY what happened</h2>
-            <p className="small muted">{mock ? 'Demo: a simple reader stands in for Claude.' : 'I’ll fill it in. You check it before it’s saved.'}</p>
-          </div>
-          <button className="icon-btn" aria-label="Close" onClick={onClose}>
-            <Glyph name="close" size={22} />
-          </button>
-        </header>
+  const head = (
+    <header className={`chat-head${talking ? ' is-talking' : ''}`}>
+      <Mascot action={mood} size={64} />
+      <div className="grow">
+        <h2>Tell KATY what happened</h2>
+        <p className="small muted">{mock ? 'Demo: a simple reader stands in for Claude.' : 'I’ll fill it in. You check it before it’s saved.'}</p>
+      </div>
+      <button className="icon-btn" aria-label="Close" onClick={() => sheet.current?.close()}>
+        <Glyph name="close" size={22} />
+      </button>
+    </header>
+  )
 
-        <div className="chat-log" aria-live="polite">
+  const foot = (
+    <form className="chat-input" onSubmit={submit}>
+      <PickPhoto className="icon-btn" label="Send a receipt photo" onPick={(p) => send(text, p)} onError={(m) => toast(m, 'worry')}>
+        <Glyph name="camera" size={20} />
+      </PickPhoto>
+      <input ref={input} value={text} onChange={(e) => setText(e.target.value)} placeholder={listening ? 'Listening…' : 'Lunch 180 GCash…'} aria-label="Message" maxLength={1000} enterKeyHint="send" />
+      {Speech && (
+        <button type="button" className={`icon-btn${listening ? ' is-on' : ''}`} aria-label={listening ? 'Stop listening' : 'Speak'} aria-pressed={listening} onClick={listen}>
+          <Glyph name="mic" size={20} />
+        </button>
+      )}
+      <button className="icon-btn send" aria-label="Send" disabled={!text.trim() || busy}>
+        <Glyph name="send" size={20} />
+      </button>
+    </form>
+  )
+
+  return (
+    <Sheet ref={sheet} label="Talk to KATY" className="chat" head={head} foot={foot} bodyProps={{ className: 'chat-log', 'aria-live': 'polite' }} onClose={onClose}>
           {lines.length === 0 && (
             <div className="chat-empty">
               <p className="small muted">Say it the way you would to a friend. Some ideas:</p>
@@ -204,24 +217,7 @@ export function MascotChat({ onClose, photo: startPhoto }: { onClose: () => void
             </div>
           )}
           <div ref={end} />
-        </div>
-
-        <form className="chat-input" onSubmit={submit}>
-          <PickPhoto className="icon-btn" label="Send a receipt photo" onPick={(p) => send(text, p)} onError={(m) => toast(m, 'worry')}>
-            <Glyph name="camera" size={20} />
-          </PickPhoto>
-          <input ref={input} value={text} onChange={(e) => setText(e.target.value)} placeholder={listening ? 'Listening…' : 'Lunch 180 GCash…'} aria-label="Message" maxLength={1000} enterKeyHint="send" />
-          {Speech && (
-            <button type="button" className={`icon-btn${listening ? ' is-on' : ''}`} aria-label={listening ? 'Stop listening' : 'Speak'} aria-pressed={listening} onClick={listen}>
-              <Glyph name="mic" size={20} />
-            </button>
-          )}
-          <button className="icon-btn send" aria-label="Send" disabled={!text.trim() || busy}>
-            <Glyph name="send" size={20} />
-          </button>
-        </form>
-      </div>
-    </>
+    </Sheet>
   )
 }
 

@@ -7,6 +7,7 @@ import { Layout } from './components/Layout'
 import { Mascot } from './components/Mascot'
 import { LogoAnimated } from './components/LogoAnimated'
 import { ToastProvider } from './components/Toast'
+import { ConfirmProvider } from './components/Confirm'
 import { Updates } from './components/WhatsNew'
 import { AuthPage } from './pages/AuthPage'
 import { TodayPage } from './pages/TodayPage'
@@ -19,6 +20,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { OnboardingPage } from './pages/OnboardingPage'
 import { NotesPage } from './pages/NotesPage'
 import { CheckPage } from './pages/CheckPage'
+import { syncPush } from './lib/push'
 
 function Gate() {
   const { session, loading } = useAuth()
@@ -80,6 +82,10 @@ function Intro() {
 
 function Ready() {
   const { loading, error, data } = useStore()
+  // keep this device's push address current for whoever is signed in (lib/push.ts)
+  useEffect(() => {
+    void syncPush()
+  }, [])
   if (loading) return <Splash />
   if (error)
     return (
@@ -121,8 +127,10 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <ToastProvider>
-          <Gate />
-          <Intro />
+          <ConfirmProvider>
+            <Gate />
+            <Intro />
+          </ConfirmProvider>
         </ToastProvider>
       </BrowserRouter>
     </AuthProvider>

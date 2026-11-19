@@ -8,6 +8,7 @@ import { paidMessage, payBill, skipBill } from '../../lib/actions'
 import { Tile } from '../../components/Bits'
 import { Glyph } from '../../components/Glyph'
 import { Mascot } from '../../components/Mascot'
+import { useConfirm } from '../../components/Confirm'
 import { Sheet } from '../../components/Sheet'
 import { MoneyField } from '../../components/Pickers'
 import { useToast } from '../../components/Toast'
@@ -136,6 +137,7 @@ export function BillsTab() {
 }
 
 function BillSheet({ bill, onClose }: { bill: Recurring | null; onClose: () => void }) {
+  const ask = useConfirm()
   const store = useStore()
   const { data } = store
   const toast = useToast()
@@ -202,7 +204,7 @@ function BillSheet({ bill, onClose }: { bill: Recurring | null; onClose: () => v
     onClose()
   }
   async function remove() {
-    if (!bill || !confirm(`Delete ${bill.title}? Past payments stay in Activity.`)) return
+    if (!bill || !(await ask({ title: `Delete ${bill.title}?`, body: 'Past payments stay in Activity.' }))) return
     await store.remove('recurring', bill.id)
     toast('Bill deleted', 'nod')
     onClose()

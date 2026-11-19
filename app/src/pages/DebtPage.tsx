@@ -10,6 +10,7 @@ import { goBack } from '../lib/back'
 import { Bar, TxAmount } from '../components/Bits'
 import { Glyph } from '../components/Glyph'
 import { Mascot } from '../components/Mascot'
+import { useConfirm } from '../components/Confirm'
 import { Sheet } from '../components/Sheet'
 import { MoneyField } from '../components/Pickers'
 import { useToast } from '../components/Toast'
@@ -22,6 +23,7 @@ export function DebtPage() {
   const look = useLookups()
   const nav = useNavigate()
   const toast = useToast()
+  const ask = useConfirm()
   const [paying, setPaying] = useState(false)
   const [editing, setEditing] = useState(false)
   const debt = data.debts.find((d) => d.id === id)
@@ -58,12 +60,19 @@ export function DebtPage() {
     }
   }
   async function forgive() {
-    if (!confirm(`Forgive the ${peso(left)} ${name} still owes?`)) return
+    const ok = await ask({
+      title: `Forgive the ${peso(left)} ${name} still owes?`,
+      body: 'The loan closes as forgiven.',
+      yes: 'Forgive',
+      tone: 'gold',
+    })
+    if (!ok) return
     await forgiveDebt(store, debt!)
     toast('Forgiven. That’s grace.', 'give')
   }
   async function remove() {
-    if (!confirm('Delete this loan and its payments?')) return
+    const ok = await ask({ title: 'Delete this loan?', body: 'Its payments are deleted too. This can’t be undone.' })
+    if (!ok) return
     for (const t of history) await store.remove('transactions', t.id)
     await store.remove('debts', debt!.id)
     toast('Loan deleted', 'nod')

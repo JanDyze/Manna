@@ -18,6 +18,17 @@ export type Release = {
  */
 export const RELEASES: Release[] = [
   {
+    version: '0.5.0',
+    date: '2026-11-19',
+    title: 'KATY can reach you now',
+    notes: [
+      { icon: 'bell', text: 'Turn on reminders in Settings → Reminders. Each evening KATY sums up the day in a line: what you spent, what’s left for the month, and tomorrow’s bills.' },
+      { icon: 'clock', text: 'On the weekday you pick she sums up the week instead, and on a month’s last day the month, with the tithe and a nudge to close it.' },
+      { icon: 'megaphone', text: 'Alerts when something needs you: a bill due tomorrow, today or late, a budget at 80% or over, a loan due, a note on its day, a card near its limit. Only between 8 AM and 10 PM, and each one once.' },
+      { icon: 'envelope', text: 'You can also get the week’s and month’s summary, and the alerts, by email.' },
+    ],
+  },
+  {
     version: '0.4.0',
     date: '2026-11-19',
     title: 'Every entry wears its own icon',

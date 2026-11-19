@@ -56,3 +56,44 @@ self.addEventListener('fetch', (event) => {
     }),
   )
 })
+
+// ---------------------------------------------------------------- reminders (push)
+// manna-notify (MigraineTracker/supabase/functions/manna-notify) sends { title, body, url, tag }. A newer message
+// with the same tag replaces the older one in the tray instead of piling up.
+self.addEventListener('push', (event) => {
+  let m = {}
+  try {
+    m = event.data ? event.data.json() : {}
+  } catch {
+    m = { body: event.data ? event.data.text() : '' }
+  }
+  event.waitUntil(
+    self.registration.showNotification(m.title || 'Manna', {
+      body: m.body || '',
+      icon: '/icon-192.png',
+      badge: '/badge-96.png',
+      tag: m.tag || undefined,
+      renotify: Boolean(m.tag),
+      lang: 'en',
+      data: { url: m.url || '/' },
+    }),
+  )
+})
+
+// Tapping a notification brings Manna forward on the page it's about (or opens it).
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  const url = new URL(event.notification.data?.url || '/', self.location.origin).href
+  event.waitUntil(
+    (async () => {
+      const open = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      const mine = open.find((c) => new URL(c.url).origin === self.location.origin)
+      if (mine) {
+        await mine.focus()
+        if (mine.url !== url && 'navigate' in mine) await mine.navigate(url).catch(() => {})
+        return
+      }
+      await self.clients.openWindow(url)
+    })(),
+  )
+})

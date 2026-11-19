@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { useAuth, firstName } from '../lib/auth'
 import { balances, cardStatus, debtLeft, goalSaved, moneyPicture, monthPlan, monthTotals, peso, tithe, upcoming } from '../lib/money'
-import { daysBetween, dueLabel, fmtDate, fromISODate, greeting, monthLabel, shortDate, thisMonth, today } from '../lib/dates'
+import { daysBetween, dueLabel, endOfMonth, fmtDate, fromISODate, greeting, monthLabel, monthOf, shortDate, thisMonth, today } from '../lib/dates'
 import { demoHour, mock } from '../lib/mock'
 import { mood, verseOfTheDay } from '../lib/words'
 import { paidMessage, payBill } from '../lib/actions'
@@ -19,8 +19,6 @@ import { Brand } from '../components/Logo'
 import { AccountMark, Tile } from '../components/Bits'
 import type { Account } from '../lib/types'
 import { useToast } from '../components/Toast'
-import { PickPhoto } from '../components/Photo'
-import type { Photo } from '../lib/photos'
 
 export function TodayPage() {
   const store = useStore()
@@ -34,25 +32,6 @@ export function TodayPage() {
   const month = thisMonth()
   // the scene follows the clock; it updates every minute
   const [talk, setTalk] = useState(false)
-  // a receipt snapped from the camp goes straight to KATY
-  const [snap, setSnap] = useState<Photo | undefined>()
-  // the camp banner can be folded away to a slim strip; remembered on this device
-  const [folded, setFolded] = useState(() => {
-    try {
-      return localStorage.getItem('manna.scene-folded') === '1'
-    } catch {
-      return false
-    }
-  })
-  const fold = () =>
-    setFolded((f) => {
-      try {
-        localStorage.setItem('manna.scene-folded', f ? '0' : '1')
-      } catch {
-        /* private mode */
-      }
-      return !f
-    })
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 60_000)
@@ -102,6 +81,15 @@ export function TodayPage() {
   const dayOfMonth = Number(t.slice(8, 10))
   const expected = plan.total * (dayOfMonth / (dayOfMonth + plan.days - 1))
   const pace = plan.total > 0 ? Math.max(0, Math.min(1, (plan.spent - expected) / Math.max(plan.total * 0.25, 1))) : 0
+  const tone: Tone = over ? 'bad' : plan.pct > 85 ? 'gold' : 'good'
+  // each day's spending this month, for the chart; and the three categories it went to most
+  const daily = new Array<number>(Number(endOfMonth(t).slice(8, 10))).fill(0)
+  for (const x of data.transactions) if (x.kind === 'expense' && monthOf(x.occurred_on) === month) daily[Number(x.occurred_on.slice(8, 10)) - 1] += x.amount
+  const top = data.categories
+    .filter((c) => c.kind === 'expense' && (totals.byCategory.get(c.id) ?? 0) > 0)
+    .map((c) => ({ c, amt: totals.byCategory.get(c.id)! }))
+    .sort((a, b) => b.amt - a.amt)
+    .slice(0, 3)
 
   async function markPaid(id: string) {
     const bill = data.recurring.find((r) => r.id === id)
@@ -119,12 +107,16 @@ export function TodayPage() {
 
   return (
     <>
-      <Scene hour={hourExact} manna={mannaShare} dry={over} pace={pace} festive={t.slice(5, 7) === '12'} jar={goals.length ? goalSavedSum / Math.max(goalTarget, 1) : null} quail={recentIncome} onJar={() => nav('/plan/goals')} collapsed={folded} onFold={(open) => open === folded && fold()}>
+      <Scene hour={hourExact} manna={mannaShare} dry={over} pace={pace} festive={t.slice(5, 7) === '12'} jar={goals.length ? goalSavedSum / Math.max(goalTarget, 1) : null} quail={recentIncome} onJar={() => nav('/plan/goals')} collapsed>
         <div className="scene-top">
           <div className="scene-greet">
             <Brand size={24} />
             <h1 style={{ marginTop: 14 }}>{hour >= 22 || hour < 5 ? 'Good night' : greeting(new Date(new Date().setHours(hour)))}{name ? `, ${name}` : ''}</h1>
             <p>{fromISODate(t).toLocaleDateString('en-US', { weekday: 'long' })} · {fmtDate(t)}</p>
+            {/* what KATY has to say, in her hand; tapping it (or her) is how you answer */}
+            <button className="scene-say" onClick={() => setTalk(true)} aria-label={`KATY says: ${m.line} Tap to talk to her.`}>
+              {m.line}
+            </button>
           </div>
           <Link to="/settings" className="icon-btn on-scene settings-btn ic-play" aria-label="Settings">
             <Glyph name="gear" size={22} />
@@ -133,17 +125,6 @@ export function TodayPage() {
         <button className="mascot-talk scene-katy" aria-label="Talk to KATY" onClick={() => setTalk(true)}>
           <Mascot action={m.action} size={124} repeatEvery={16000} />
         </button>
-        <p className="bubble">{m.line}</p>
-        <div className="scene-actions">
-          <button className="talk-pill" onClick={() => setTalk(true)}>
-            <Glyph name="spark" size={16} />
-            Tell KATY
-          </button>
-          <PickPhoto className="snap-pill" label="Snap a receipt" onPick={(p) => (setSnap(p), setTalk(true))} onError={(m) => toast(m, 'worry')}>
-            <Glyph name="camera" size={18} />
-          </PickPhoto>
-        </div>
-        <button className="scene-fold" onClick={fold} aria-expanded={!folded} aria-label={folded ? 'Show the camp' : 'Fold the camp away'} />
       </Scene>
 
       <div className="page" style={{ paddingTop: 0 }}>
@@ -171,10 +152,12 @@ export function TodayPage() {
 
         <Wallet available={available} have={picture.have} owed={picture.owed} accounts={accounts} bal={bal} />
 
+        <QuickActions onKaty={() => setTalk(true)} />
+
         <Link to="/plan/budgets" className="card card-link spend-card">
           {plan.total > 0 ? (
             <div className="spend-top">
-              <Ring pct={plan.pct} tone={over ? 'bad' : plan.pct > 85 ? 'gold' : 'good'} />
+              <Ring pct={plan.pct} tone={tone} />
               <div className="grow" style={{ minWidth: 0 }}>
                 <p className="eyebrow">{fromISODate(t).toLocaleDateString('en-US', { month: 'long' })} spending</p>
                 <p className="num" style={{ marginTop: 2 }}>
@@ -195,6 +178,20 @@ export function TodayPage() {
               </div>
               <Glyph name="fwd" size={18} className="faint" />
             </div>
+          )}
+          {totals.spent > 0 && <SpendChart daily={daily} today={dayOfMonth} budget={plan.total} tone={plan.total > 0 ? tone : 'good'} month={t} />}
+          {top.length > 0 && (
+            <ul className="top-spend" aria-label="Where it went">
+              {top.map(({ c, amt }) => (
+                <li key={c.id}>
+                  <span className="top-spend-ic"><Glyph name={c.icon} size={16} /></span>
+                  <span className="top-spend-name ellipsis">{c.name}</span>
+                  <span className="top-spend-bar" aria-hidden="true"><span style={{ width: `${(amt / top[0].amt) * 100}%` }} /></span>
+                  <span className="top-spend-amt num">{peso(Math.round(amt))}</span>
+                  <span className="top-spend-pct num">{Math.round((amt / totals.spent) * 100)}%</span>
+                </li>
+              ))}
+            </ul>
           )}
         </Link>
 
@@ -238,6 +235,12 @@ export function TodayPage() {
               <Link to="/add?kind=giving" className="btn sm gold">Give {peso(Math.max(0, ti.due - ti.given))}</Link>
             ) : null}
           </div>
+          {!ti.done && ti.due > 0 && (
+            <div className="tithe-progress">
+              <div className="bar"><span className="gold" style={{ width: `${Math.min(100, (ti.given / ti.due) * 100)}%` }} /></div>
+              <p className="tiny muted num">{peso(ti.given)} of {peso(ti.due)} set apart</p>
+            </div>
+          )}
         </section>
 
         <section className="card flush">
@@ -272,27 +275,39 @@ export function TodayPage() {
           )}
         </section>
 
-        <Link to="/owed" className="card card-link row">
-          <Tile icon="people" />
-          <div className="grow grid-2">
-            <div>
-              <p className="tiny muted">Owed to you</p>
-              <p className="num good" style={{ fontWeight: 600 }}>{peso(owedToMe)}</p>
-            </div>
-            <div>
-              <p className="tiny muted">You owe</p>
-              <p className="num bad" style={{ fontWeight: 600 }}>{peso(iOwe)}</p>
-            </div>
-          </div>
-          <Glyph name="fwd" size={18} className="faint" />
-        </Link>
+        {/* two small cards side by side: what's being saved, and who owes whom */}
+        <div className="glance">
+          <Link to="/plan/goals" className="card card-link glance-card">
+            <span className="glance-head">
+              <span className="glance-ic good"><Glyph name="jar" size={18} /></span>
+              <span className="eyebrow">Goals</span>
+            </span>
+            {goals.length ? (
+              <>
+                <p className="glance-num num">{peso(Math.round(goalSavedSum))}</p>
+                <p className="tiny muted num ellipsis">of {peso(goalTarget)}{goals.length > 1 ? ` · ${goals.length} goals` : ''}</p>
+                <div className="bar"><span className="good" style={{ width: `${Math.min(100, (goalSavedSum / Math.max(goalTarget, 1)) * 100)}%` }} /></div>
+              </>
+            ) : (
+              <p className="small muted">Name something to save for.</p>
+            )}
+          </Link>
+          <Link to="/owed" className="card card-link glance-card">
+            <span className="glance-head">
+              <span className="glance-ic"><Glyph name="people" size={18} /></span>
+              <span className="eyebrow">Owed</span>
+            </span>
+            <p className="glance-line"><span className="tiny muted">To you</span><strong className="num good">{peso(owedToMe)}</strong></p>
+            <p className="glance-line"><span className="tiny muted">You owe</span><strong className="num bad">{peso(iOwe)}</strong></p>
+          </Link>
+        </div>
 
         <figure className="verse" style={{ margin: '4px 0 0' }}>
           <p>“{verse.text}”</p>
           <cite>{verse.ref}</cite>
         </figure>
       </div>
-      {talk && <MascotChat photo={snap} onClose={() => (setTalk(false), setSnap(undefined))} />}
+      {talk && <MascotChat onClose={() => setTalk(false)} />}
       {noteOpen && <NoteSheet note={noteOpen} onClose={() => setNoteOpen(null)} />}
     </>
   )
@@ -370,7 +385,7 @@ function Wallet({ available, have, owed, accounts, bal }: { available: number; h
         {[[300, 22, 1.8], [344, 60, 1.5], [296, 56, 1.1], [350, 14, 1.2]].map(([x, y, r], i) => (
           <ellipse key={i} cx={x} cy={y} rx={r * 1.5} ry={r} />
         ))}
-        <path className="wallet-star" d="M326 16 Q328 28 339 33 Q326 33 322 45 Q319 35 307 33 Q322 30 326 16Z" />
+        <path className="wallet-star" d="M323 16 Q325.2 28.8 338 31 Q325.2 33.2 323 46 Q320.8 33.2 308 31 Q320.8 28.8 323 16Z" />
       </svg>
       <div className="wallet-head">
         <p className="eyebrow">{owed > 0 ? 'Free to use' : 'Available now'}</p>
@@ -404,8 +419,87 @@ function Wallet({ available, have, owed, accounts, bal }: { available: number; h
   )
 }
 
+type Tone = 'good' | 'gold' | 'bad'
+
+/** The kinds the gold + doesn't start on, one tap away; and KATY. */
+function QuickActions({ onKaty }: { onKaty: () => void }) {
+  return (
+    <nav className="quick" aria-label="Quick actions">
+      <Link to="/add?kind=income" className="quick-btn">
+        <span className="quick-ic good"><Glyph name="wallet" size={22} /></span>
+        Received
+      </Link>
+      <Link to="/add?kind=transfer" className="quick-btn">
+        <span className="quick-ic"><Glyph name="swap" size={22} /></span>
+        Transfer
+      </Link>
+      <Link to="/add?kind=giving" className="quick-btn">
+        <span className="quick-ic gold"><Glyph name="hands" size={22} /></span>
+        Give
+      </Link>
+      <button type="button" className="quick-btn" onClick={onKaty}>
+        <span className="quick-ic cape"><Glyph name="chat" size={22} /></span>
+        Ask KATY
+      </button>
+    </nav>
+  )
+}
+
+/**
+ * The month so far as a line: spending adding up day by day, against the budget (dashed across the top)
+ * and an even pace toward it (the faint diagonal). Above the diagonal means ahead of pace.
+ */
+function SpendChart({ daily, today: day, budget, tone, month }: { daily: number[]; today: number; budget: number; tone: Tone; month: string }) {
+  const W = 300
+  const H = 76
+  const n = daily.length
+  const cum: number[] = [0]
+  for (let d = 0; d < day; d++) cum.push(cum[d] + daily[d])
+  const spent = cum[day]
+  const top = Math.max(budget, spent) * 1.12 || 1
+  const x = (d: number) => (d / n) * W
+  const y = (v: number) => H - (v / top) * (H - 4)
+  const line = cum.map((v, d) => `${d ? 'L' : 'M'}${x(d).toFixed(1)} ${y(v).toFixed(1)}`).join(' ')
+  const area = `${line} L${x(day).toFixed(1)} ${H} L0 ${H}Z`
+  const mon = fromISODate(month).toLocaleDateString('en-US', { month: 'short' })
+  return (
+    <div className={`spend-chart ${tone}`} role="img" aria-label={`Spent ${peso(spent)} so far this month${budget > 0 ? ` of a ${peso(budget)} budget` : ''}`}>
+      <div className="spend-chart-plot">
+        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="spend-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="currentColor" stopOpacity=".28" />
+              <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {budget > 0 && (
+            <>
+              <line className="spend-chart-pace" x1="0" y1={H} x2={W} y2={y(budget)} vectorEffect="non-scaling-stroke" />
+              <line className="spend-chart-budget" x1="0" y1={y(budget)} x2={W} y2={y(budget)} vectorEffect="non-scaling-stroke" />
+            </>
+          )}
+          <path d={area} fill="url(#spend-fill)" />
+          <path className="spend-chart-line" d={line} vectorEffect="non-scaling-stroke" />
+        </svg>
+        {/* the dot is HTML so the stretched SVG doesn't squash it */}
+        <span className="spend-chart-dot" style={{ left: `${(x(day) / W) * 100}%`, top: `${(y(spent) / H) * 100}%` }} />
+        {budget > 0 && (
+          <span className="spend-chart-tag num" style={{ top: `${(y(budget) / H) * 100}%` }}>
+            Budget {peso(budget)}
+          </span>
+        )}
+      </div>
+      <div className="spend-chart-axis tiny">
+        <span>{mon} 1</span>
+        {day / n > 0.16 && day / n < 0.84 && <span style={{ left: `${(day / n) * 100}%` }} className="spend-chart-today">Today</span>}
+        <span>{mon} {n}</span>
+      </div>
+    </div>
+  )
+}
+
 /** A small ring showing how much of the month's budget is used. */
-function Ring({ pct, tone }: { pct: number; tone: 'good' | 'gold' | 'bad' }) {
+function Ring({ pct, tone }: { pct: number; tone: Tone }) {
   const r = 21
   const c = 2 * Math.PI * r
   const v = Math.min(100, Math.max(0, pct))

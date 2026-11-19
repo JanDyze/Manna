@@ -10,10 +10,10 @@ import { Glyph } from '../components/Glyph'
 import { goBack } from '../lib/back'
 import { AccountChips, CategoryGrid } from '../components/Pickers'
 import { useToast } from '../components/Toast'
+import { useConfirm } from '../components/Confirm'
 import { PickPhoto, Thumb } from '../components/Photo'
 import { removePhoto, type Photo } from '../lib/photos'
 import { ask, keepPhoto } from '../lib/assistant'
-import { mock } from '../lib/mock'
 import { morph, morphing, settled } from '../lib/morph'
 
 const KINDS: { kind: TxKind; label: string }[] = [
@@ -35,6 +35,7 @@ export function AddPage() {
   const { data } = store
   const nav = useNavigate()
   const toast = useToast()
+  const sure = useConfirm()
   const editing = id ? data.transactions.find((t) => t.id === id) : undefined
 
   const accounts = data.accounts.filter((a) => !a.archived || a.id === editing?.account_id || a.id === editing?.to_account_id).sort((a, b) => a.sort - b.sort)
@@ -132,7 +133,6 @@ export function AddPage() {
     setError(null)
     setHeard(null)
     if (!read) return
-    if (mock) return setHeard('In the demo I can’t read receipts yet. I kept the photo; type the total.')
     setReading(true)
     try {
       const out = await ask('', [], data, p)
@@ -210,7 +210,7 @@ export function AddPage() {
   }
 
   async function remove() {
-    if (!editing || !confirm('Delete this entry?')) return
+    if (!editing || !(await sure({ title: 'Delete this entry?', body: 'This can’t be undone.' }))) return
     setBusy(true)
     try {
       await store.remove('transactions', editing.id)

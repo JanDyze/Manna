@@ -1,6 +1,6 @@
-// Talking to the mascot. Claude does the understanding (supabase/functions/manna-mascot); in demo mode a small
-// rule-based reader stands in so the chat still works without a key. Either way nothing is saved until the
-// person confirms each entry.
+// Talking to the mascot. Claude does the understanding (supabase/functions/manna-mascot). A small rule-based
+// reader on the device stands in for it in demo mode, when the function has no key yet, or when it can't be
+// reached (offline). Either way nothing is saved until the person confirms each entry.
 import { supabase } from './supabase'
 import { mock } from './mock'
 import { addDays, today } from './dates'
@@ -9,6 +9,7 @@ import type { Data } from './store'
 import type { useStore } from './store'
 import type { Tx } from './types'
 import { uploadPhoto, type Photo } from './photos'
+import { readReceipt, ReaderUnavailable, type ReadReceipt } from './receipt'
 
 export type EntryKind = 'expense' | 'income' | 'giving' | 'transfer' | 'lend' | 'borrow' | 'note'
 export type Entry = {
@@ -32,9 +33,22 @@ export type Turn = { role: 'user' | 'assistant'; text: string; entries?: Entry[]
 /** Kinds a receipt photo belongs with. */
 const WITH_PHOTO: EntryKind[] = ['expense', 'income', 'giving', 'note']
 
-/** Send a message (and maybe a photo of a receipt); get a reply and proposed entries. */
+// set once the mascot function answers that it isn't there or has no key, so later messages don't wait on it
+let claudeOff = false
+
+/** Send a message (and maybe a photo of a receipt); get a reply and proposed entries. Without Claude (the demo,
+ *  no key, or no connection) the phone reads it: rules for typed words, on-device OCR for photos. */
 export async function ask(message: string, history: Turn[], data: Data, photo?: Photo): Promise<{ reply: string; entries: Entry[] }> {
-  const out = mock ? readLocally(message, data, photo) : await askClaude(message, history, data, photo)
+  let out: { reply: string; entries: Entry[] }
+  if (mock || claudeOff) out = await readLocally(message, data, photo)
+  else {
+    try {
+      out = await askClaude(message, history, data, photo)
+    } catch (e) {
+      console.warn('KATY: Claude unavailable, reading on the phone instead.', e)
+      out = await readLocally(message, data, photo)
+    }
+  }
   // the receipt goes along with what it was read into
   if (photo) out.entries = out.entries.map((e) => (WITH_PHOTO.includes(e.kind) ? { ...e, photo } : e))
   return out
@@ -54,8 +68,11 @@ async function askClaude(message: string, history: Turn[], data: Data, photo?: P
     body: { message, history: history.map((t) => ({ role: t.role, text: t.text })), context, image: photo ? { media_type: photo.type, data: photo.base64 } : undefined },
   })
   if (error) {
+    const res = (error as { context?: Response }).context
+    // not deployed, or deployed without a key: stop asking it this session
+    if (res?.status === 404 || res?.status === 503) claudeOff = true
     // the function's own message is friendlier than the transport error
-    const detail = await (error as { context?: Response }).context?.json?.().catch(() => null)
+    const detail = await res?.json?.().catch(() => null)
     throw new Error(detail?.error ?? 'I couldn’t reach my thinking just now.')
   }
   return { reply: out.reply ?? '', entries: (out.entries ?? []).map((e: Entry) => fill(e, data)) }
@@ -164,18 +181,63 @@ function remindOn(text: string): string | null {
   return n ? addDays(today(), Number(n[1])) : null
 }
 
-function readLocally(message: string, data: Data, photo?: Photo): { reply: string; entries: Entry[] } {
-  // the demo can't read pictures: keep the photo on an expense and let them type the amount
-  if (photo && !amountIn(message)) {
-    const cash = data.accounts.find((a) => a.kind === 'cash' && !a.archived) ?? data.accounts.find((a) => !a.archived)
-    const other = data.categories.find((c) => c.kind === 'expense' && !c.archived && c.name === 'Other')
-    const hit = WORDS.find(([, re]) => re.test(message))
-    const cat = (hit && data.categories.find((c) => c.kind === 'expense' && !c.archived && c.name === hit[0])) || other
+async function readLocally(message: string, data: Data, photo?: Photo): Promise<{ reply: string; entries: Entry[] }> {
+  // a photo with no amount typed: read the receipt here on the phone
+  if (photo && !amountIn(message)) return readPhoto(message, data, photo)
+  return readWords(message, data)
+}
+
+async function readPhoto(message: string, data: Data, photo: Photo): Promise<{ reply: string; entries: Entry[] }> {
+  const cash = data.accounts.find((a) => a.kind === 'cash' && !a.archived) ?? data.accounts.find((a) => !a.archived)
+  const other = data.categories.find((c) => c.kind === 'expense' && !c.archived && c.name === 'Other')
+  const hit = WORDS.find(([, re]) => re.test(message))
+  const typed = hit && data.categories.find((c) => c.kind === 'expense' && !c.archived && c.name === hit[0])
+  // couldn't get a total: keep the photo (and whatever else was read) on an entry and let them type the amount
+  const blank = (reply: string, r?: ReadReceipt): { reply: string; entries: Entry[] } => {
+    const account = r?.account_id ?? cash?.id
     return {
-      reply: 'In the demo I can’t read receipts yet, so I kept the photo here. Type the total and tap Save.',
-      entries: cash ? [{ kind: 'expense', amount: 0, account_id: cash.id, category_id: cat?.id, note: message.trim() || 'Receipt', occurred_on: today() }] : [],
+      reply,
+      entries: account
+        ? [{ kind: r?.kind ?? 'expense', amount: 0, account_id: account, category_id: typed?.id ?? r?.category_id ?? other?.id, note: message.trim() || r?.note || 'Receipt', occurred_on: r?.date ?? today() }]
+        : [],
     }
   }
+  let r: ReadReceipt
+  try {
+    r = await readReceipt(photo, data)
+  } catch (err) {
+    console.warn('KATY: reading the photo failed', err)
+    return blank(
+      err instanceof ReaderUnavailable
+        ? 'I couldn’t start my photo reader. It needs the internet the first time. I kept the photo; type the total and tap Save.'
+        : 'Something went wrong reading that picture. I kept the photo; type the total and tap Save.',
+    )
+  }
+  if (!r.total)
+    return blank(
+      r.text.trim().length < 15
+        ? 'I couldn’t see any writing on that one. Try again closer, flat and in good light, or type the total and tap Save.'
+        : 'I read the receipt but couldn’t find the total. I filled in what I could; type the total and tap Save.',
+      r,
+    )
+  const e: Entry = {
+    kind: r.kind,
+    amount: r.total,
+    account_id: r.account_id ?? cash?.id ?? '',
+    // what they typed with the photo ("groceries") beats the guess
+    category_id: typed?.id ?? r.category_id ?? undefined,
+    note: message.trim() || r.note || 'Receipt',
+    occurred_on: r.date ?? today(),
+  }
+  return {
+    reply: r.sure
+      ? `Read on your phone: looks like a ${r.type.toLowerCase()}. Check the total and tap Save.`
+      : 'I couldn’t find a TOTAL line, so this total is my best guess. Please check it before saving.',
+    entries: [e],
+  }
+}
+
+function readWords(message: string, data: Data): { reply: string; entries: Entry[] } {
   // questions about what KATY remembers
   if (ASK_NOTES.test(message)) {
     const who = personIn(message.replace(/^\s*\w+/, ''), data)

@@ -6,7 +6,14 @@ import { supabase } from './supabase'
 import { mock } from './mock'
 
 /** A photo picked or taken, ready to show, send to KATY, or upload. */
-export type Photo = { blob: Blob; url: string; base64: string; type: 'image/jpeg' }
+export type Photo = {
+  blob: Blob
+  url: string
+  base64: string
+  type: 'image/jpeg'
+  /** the picture as picked, full size: reading a receipt on the phone wants more detail than 1280px keeps */
+  source?: Blob
+}
 
 const MAX = 1280
 
@@ -30,10 +37,10 @@ export async function shrink(file: Blob): Promise<Photo> {
     r.onload = () => ok(String(r.result).split(',')[1] ?? '')
     r.readAsDataURL(blob)
   })
-  return { blob, url: URL.createObjectURL(blob), base64, type: 'image/jpeg' }
+  return { blob, url: URL.createObjectURL(blob), base64, type: 'image/jpeg', source: file }
 }
 
-async function loadImage(file: Blob): Promise<ImageBitmap | HTMLImageElement> {
+export async function loadImage(file: Blob): Promise<ImageBitmap | HTMLImageElement> {
   // createImageBitmap honours the photo's EXIF rotation, so a portrait receipt stays upright
   if ('createImageBitmap' in window) {
     try {

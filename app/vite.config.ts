@@ -27,5 +27,8 @@ export default defineConfig({
   },
   // Might uses 5180; Manna takes the next port so both can run at once. Must match site_url in supabase/config.toml
   server: { port: 5181, strictPort: true },
+  // the receipt reader is only imported when a photo arrives; bundle it at startup so that first import
+  // doesn't race the dev server preparing it ("Failed to fetch dynamically imported module")
+  optimizeDeps: { include: ['tesseract.js'] },
   preview: { port: 5181, strictPort: true },
 })

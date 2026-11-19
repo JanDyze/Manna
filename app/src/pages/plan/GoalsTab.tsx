@@ -8,6 +8,7 @@ import { Bar, Tile } from '../../components/Bits'
 import { Glyph } from '../../components/Glyph'
 import { IconPicker } from '../../components/IconPicker'
 import { Mascot } from '../../components/Mascot'
+import { useConfirm } from '../../components/Confirm'
 import { Sheet } from '../../components/Sheet'
 import { MoneyField } from '../../components/Pickers'
 import { useToast } from '../../components/Toast'
@@ -94,6 +95,7 @@ export function GoalsTab() {
 }
 
 function GoalSheet({ goal, onClose }: { goal: Goal | null; onClose: () => void }) {
+  const ask = useConfirm()
   const store = useStore()
   const toast = useToast()
   const [name, setName] = useState(goal?.name ?? '')
@@ -124,7 +126,7 @@ function GoalSheet({ goal, onClose }: { goal: Goal | null; onClose: () => void }
     onClose()
   }
   async function remove() {
-    if (!goal || !confirm(`Delete ${goal.name} and its history?`)) return
+    if (!goal || !(await ask({ title: `Delete ${goal.name}?`, body: 'Its saving history goes with it. This can’t be undone.' }))) return
     await store.remove('goals', goal.id)
     toast('Goal deleted', 'nod')
     onClose()

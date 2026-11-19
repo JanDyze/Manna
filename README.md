@@ -73,7 +73,7 @@ Open http://localhost:5181/?mock for sample data. Nothing is saved in this mode.
 Manna shares the OneDyze Supabase project with Might (and Kept), so it also shares Might's local stack.
 Its tables live in their own `manna` schema; logins are shared, so sign in with your Might account.
 
-- Migrations in `MigraineTracker/supabase/migrations/`: `20261117000000_manna_schema.sql`, `20261118000000_manna_onboarding.sql`, `20261118000100_manna_no_bank_default.sql`, `20261118000200_manna_notes.sql`, `20261118000300_manna_balance_checks.sql`, `20261118000400_manna_receipts.sql`, `20261118000500_manna_connector_keys.sql`
+- Migrations in `MigraineTracker/supabase/migrations/`: `20261117000000_manna_schema.sql`, `20261118000000_manna_onboarding.sql`, `20261118000100_manna_no_bank_default.sql`, `20261118000200_manna_notes.sql`, `20261118000300_manna_balance_checks.sql`, `20261118000400_manna_receipts.sql`, `20261118000500_manna_connector_keys.sql`, `20261120000000_manna_notifications.sql`
 - `MigraineTracker/supabase/config.toml` exposes `manna` and allows Manna's dev address (port 5181) for sign-in redirects
 - `app/.env.local` points at the same local API and key as Might
 
@@ -113,6 +113,9 @@ From `MigraineTracker`, `npx supabase db push` now sends Manna's migration too (
 | `notes` | KATY's notes |
 | `balance_checks` | Month-end checks |
 | `connector_keys` | Links that let Claude reach your Manna (hashed, revocable) |
+| `notify_settings` | What reminders each person wants: evening summary, alerts, email |
+| `push_subscriptions` | The devices that get push notifications |
+| `notify_log` | Which summaries and alerts were sent, so each goes out once |
 
 Every row belongs to one user and only they can read or change it (row-level security). A trigger also
 stops a row from pointing at someone else's account or category. The first sign-in runs
@@ -168,6 +171,42 @@ npx supabase functions deploy manna-mcp --no-verify-jwt    # Claude sends no Sup
 (`npx @modelcontextprotocol/inspector`, transport "Streamable HTTP", paste the link) or Claude Desktop through
 `npx mcp-remote <link>`.
 
+## Reminders (push notifications and email)
+
+Settings → Reminders. KATY reaches the person outside the app:
+
+- **Each evening** at their hour (5–11 PM, default 9): the day in a line: spent, what's left for the month and a day's share of it, tomorrow's bills. On their chosen weekday (default Sunday) the **week's** summary comes instead, and on a month's last day the **month's**, with the tithe and a nudge to close it. One notification an evening.
+- **Alerts**, 8 AM to 10 PM only, each once: a bill due tomorrow, today, or late; a budget at 80% or over (and the whole plan over); a loan due (what you owe: the day before and on the day; what you're owed: on the day); a note on its remind day; a card with less than a tenth of its limit left. Several at once arrive as one notification.
+- **Email** (optional): the week's and month's summaries, and the alerts, to the sign-in address.
+
+Tapping a notification opens the page it's about. Turning reminders on is per device; what's sent is per person. Signing out turns this device off.
+
+**How it works:** the app subscribes the device with Web Push (`app/src/lib/push.ts`, `public/sw.js`) and saves it through `manna.save_push_subscription()`. Every hour pg_cron runs `manna.notify_tick()`, which calls the Edge Function `manna-notify` (`MigraineTracker/supabase/functions/manna-notify/`). The function works out what's due (`compose.ts`, using the same money maths as `manna-mcp`), sends it, and writes each one to `manna.notify_log` so it goes out once. The Web Push encryption and VAPID signing (`webpush.ts`) use plain WebCrypto, so no packages are needed. Email goes through [Resend](https://resend.com). Migration: `20261120000000_manna_notifications.sql`.
+
+**Phones:** Android with Chrome works from the browser or the installed app. iPhone and iPad need iOS 16.4 or later and Manna added to the Home Screen; the sheet says so.
+
+**Setting it up (cloud), once:**
+
+```sh
+npx web-push generate-vapid-keys            # keep these; changing them later strands every device
+cd MigraineTracker
+npx supabase db push                        # tables, the RPC, pg_cron/pg_net and the hourly job
+npx supabase secrets set VAPID_PUBLIC_KEY=… VAPID_PRIVATE_KEY=… VAPID_SUBJECT=mailto:you@example.com MANNA_NOTIFY_SECRET=<long random string>
+# optional email:  npx supabase secrets set RESEND_API_KEY=re_… MANNA_EMAIL_FROM="KATY from Manna <katy@yourdomain>" MANNA_APP_URL=https://<manna's address>
+npx supabase functions deploy manna-notify --no-verify-jwt
+```
+
+Then in the dashboard's SQL editor, tell the hourly job where to call and with which secret (the same `MANNA_NOTIFY_SECRET`):
+
+```sql
+select vault.create_secret('https://<project>.supabase.co/functions/v1/manna-notify', 'manna_notify_url');
+select vault.create_secret('<MANNA_NOTIFY_SECRET>', 'manna_notify_secret');
+```
+
+Until both are in Vault the job does nothing. Without `RESEND_API_KEY` the email switches say email isn't set up. Resend's test sender (`onboarding@resend.dev`) only delivers to your own Resend account's address; verify a domain to send from your own.
+
+**Locally:** put the same keys in `MigraineTracker/supabase/functions/.env` (see `.env.example`), run `npx supabase functions serve`, and use `http://supabase_kong_MigraineTracker:8000/functions/v1/manna-notify` as the Vault URL (the database reaches the gateway inside Docker). Push needs the service worker, so try it on `npm run build && npm run preview`, not the dev server. To run a round by hand: `select manna.notify_tick();`, and the reply is in `net._http_response`.
+
 ## Deploy
 
 The same as Might: Cloudflare Workers static assets.
@@ -193,6 +232,7 @@ The PWA works offline for opening the app, but saving needs a connection.
 | Settings: accounts, tithe, categories, theme | `app/src/pages/SettingsPage.tsx` |
 | First-run setup | `app/src/pages/OnboardingPage.tsx` |
 | Talking to the mascot | `app/src/components/MascotChat.tsx`, `app/src/lib/assistant.ts`, `../MigraineTracker/supabase/functions/manna-mascot/` |
+| Reminders (push, email) | `app/src/components/Reminders.tsx`, `app/src/lib/push.ts`, `app/public/sw.js`, `../MigraineTracker/supabase/functions/manna-notify/` |
 | Manna in Claude (MCP server, connector links) | `../MigraineTracker/supabase/functions/manna-mcp/`, `app/src/components/ConnectClaude.tsx` |
 | What the mascot does and says; verses | `app/src/lib/words.ts` |
 | Money maths | `app/src/lib/money.ts` |

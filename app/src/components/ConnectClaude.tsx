@@ -9,6 +9,7 @@ import { Sheet } from './Sheet'
 import { Glyph } from './Glyph'
 import { Tile } from './Bits'
 import { useToast } from './Toast'
+import { useConfirm } from './Confirm'
 
 type Link = { id: string; label: string; key_hint: string; created_at: string; last_used_at: string | null; revoked_at: string | null }
 
@@ -19,6 +20,7 @@ const day = (iso: string) => fmtDate(iso.slice(0, 10))
 
 export function ConnectClaudeSheet({ onClose }: { onClose: () => void }) {
   const toast = useToast()
+  const ask = useConfirm()
   const [links, setLinks] = useState<Link[] | null>(mock ? [] : null)
   const [label, setLabel] = useState('Claude')
   const [fresh, setFresh] = useState<string | null>(null)
@@ -49,7 +51,12 @@ export function ConnectClaudeSheet({ onClose }: { onClose: () => void }) {
   }
 
   async function revoke(l: Link) {
-    if (!confirm(`Revoke “${l.label}”? Claude stops reaching your Manna through it within a minute.`)) return
+    const ok = await ask({
+      title: `Revoke “${l.label}”?`,
+      body: 'Claude stops reaching your Manna through it within a minute.',
+      yes: 'Revoke',
+    })
+    if (!ok) return
     const { error } = await supabase.from('connector_keys').update({ revoked_at: new Date().toISOString() }).eq('id', l.id)
     if (error) return setError(error.message)
     toast('Link revoked', 'nod')

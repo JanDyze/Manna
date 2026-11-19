@@ -77,6 +77,99 @@ const STARS = (() => {
 
 const STAR = 'M0 -13 Q2 -2 11 0 Q2 2 0 13 Q-2 2 -11 0 Q-2 -2 0 -13 Z'
 
+const TENT = 'M-17 0 L-15 -10 Q-8 -14 -1 -11 Q7 -15 15 -10 L17 0 Z'
+const FLAME = 'M0 0 C -11 -1 -13 -12 -7 -20 C -6 -13 -2 -14 0 -30 C 5 -19 13 -15 9 -6 C 8 -2 5 0 0 0 Z'
+const SPARKS = [
+  [-3, 0, 2.6, 1.1],
+  [4, 0.9, 3.1, 0.9],
+  [0, 1.7, 2.8, 1.2],
+  [-6, 2.4, 3.4, 0.8],
+  [7, 3.1, 2.5, 1],
+]
+
+/**
+ * Night in the camp, close up: the sand around a fire, a tent with its door lit, and the hills dark behind.
+ * It sits on the right, beside the greeting (the art is pinned to the right edge, so it stays there at any width),
+ * with KATY resting on the right of the fire and the tent on its left.
+ * After midnight it burns low.
+ */
+function Campfire({ far, near, sand, shade, low }: { far: string; near: string; sand: string; shade: string; low: boolean }) {
+  return (
+    // drawn at a fixed 1:1 scale, pinned to the right edge, so KATY (placed in CSS) always lands beside the fire;
+    // the hills run 120 units further left to fill the widest layout
+    <svg className={`campfire${low ? ' is-low' : ''}`} viewBox="-120 0 520 110" width="520" height="110" aria-hidden="true">
+      <defs>
+        <radialGradient id="cf-glow" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stopColor="#ffb357" stopOpacity=".55" />
+          <stop offset=".45" stopColor="#f08a3c" stopOpacity=".16" />
+          <stop offset="1" stopColor="#f08a3c" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="cf-pool" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stopColor="#ffc46b" stopOpacity=".5" />
+          <stop offset="1" stopColor="#ffc46b" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="cf-ground" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={sand} />
+          <stop offset="1" stopColor={shade} />
+        </linearGradient>
+        {/* the fire's side of the tent catches its light */}
+        <linearGradient id="cf-tentlit" x1="0" y1="0" x2="1" y2="0">
+          <stop offset=".3" stopColor="#f2a04a" stopOpacity="0" />
+          <stop offset="1" stopColor="#f2a04a" stopOpacity=".5" />
+        </linearGradient>
+      </defs>
+
+      {/* hills behind */}
+      <path d="M-120 58 C -80 52 -40 60 0 62 C 34 54 62 40 96 42 C 128 44 146 60 178 58 C 212 56 236 34 272 32 C 306 30 332 52 362 54 C 382 55 394 50 400 48 V110 H-120 Z" fill={far} />
+      <path d="M-120 72 C -70 68 -30 70 0 74 C 60 64 120 66 190 70 S 330 66 400 62 V110 H-120 Z" fill={near} opacity=".9" />
+
+      {/* kept inside the layer's top edge, so the light doesn't end in a line across the sky */}
+      <ellipse className="cf-glow" cx="300" cy="98" rx="120" ry="56" fill="url(#cf-glow)" />
+
+      {/* the sand the camp sits on, warm where the fire reaches */}
+      <path d="M-120 80 C -70 76 -30 78 0 82 C 80 74 150 76 220 80 S 340 76 400 72 V110 H-120 Z" fill="url(#cf-ground)" />
+      <ellipse className="cf-pool" cx="300" cy="98" rx="70" ry="11" fill="url(#cf-pool)" />
+
+      {/* the tent near the fire */}
+      <g transform="translate(226 94) scale(1.3)">
+        <ellipse cx="0" cy=".6" rx="19" ry="1.6" fill="#000" opacity=".25" />
+        <path d={TENT} fill="#262c42" />
+        <path d={TENT} fill="url(#cf-tentlit)" />
+        <path d="M-15 -10 L-19 -3 M15 -10 L19 -3" stroke="#262c42" strokeWidth=".5" />
+        {/* the door: lamplight in a pointed opening, its flap tied back toward the fire */}
+        <path d="M-2.6 0 Q-1.6 -5.4 .6 -8.6 Q2.6 -5.2 3.4 0 Z" fill="#f2b04f" className="sc-tent-glow" />
+        <path d="M.6 -8.6 Q3.2 -5 3.4 0 L6.4 0 Q5.4 -5.2 .6 -8.6 Z" fill="#3a3f57" />
+      </g>
+
+      {/* the fire: a ring of stones, crossed logs, three flames and sparks going up */}
+      <g transform="translate(296 98) scale(.9)">
+        <g className="cf-flames">
+          <g transform="scale(1.15)"><path className="cf-flame f1" d={FLAME} fill="#e8702f" /></g>
+          <g transform="scale(.82)"><path className="cf-flame f2" d={FLAME} fill="#f6a93f" /></g>
+          <g transform="scale(.45)"><path className="cf-flame f3" d={FLAME} fill="#fff0b3" /></g>
+        </g>
+        <g className="cf-sparks" fill="#ffd27a">
+          {SPARKS.map(([x, d, dur, r], i) => (
+            <circle key={i} cx={x} cy="-16" r={r} style={{ animationDelay: `${d}s`, animationDuration: `${dur}s` }} />
+          ))}
+        </g>
+        <path d="M-15 2 L13 -4" stroke="#5a3a26" strokeWidth="4.2" strokeLinecap="round" />
+        <path d="M-13 -4 L15 2" stroke="#6b4630" strokeWidth="4.2" strokeLinecap="round" />
+        <g fill="#4a4f63">
+          <ellipse cx="-18" cy="3" rx="5" ry="3.2" />
+          <ellipse cx="-8" cy="5" rx="5.5" ry="3" />
+          <ellipse cx="4" cy="5.2" rx="5.5" ry="3" />
+          <ellipse cx="15" cy="3.4" rx="5" ry="3.2" />
+        </g>
+        <g fill="#f2a04a" opacity=".55">
+          <ellipse cx="-8" cy="3.6" rx="4" ry="1.2" />
+          <ellipse cx="4" cy="3.8" rx="4" ry="1.2" />
+        </g>
+      </g>
+    </svg>
+  )
+}
+
 export type SceneProps = {
   /** the hour of the day, with fractions: 6.5 is half past six */
   hour: number
@@ -95,8 +188,6 @@ export type SceneProps = {
   onJar?: () => void
   /** folded down to a slim strip: just the sky and the greeting */
   collapsed?: boolean
-  /** a flick on the camp: up asks to fold it, down to open it (only at the top of the page) */
-  onFold?: (open: boolean) => void
   children?: ReactNode
 }
 
@@ -108,9 +199,8 @@ export type SceneProps = {
  * savings: provision laid up wisely (Proverbs 21:20). Quail come in at evening after payday (Exodus 16:13).
  * The palms are Elim's (Exodus 15:27). Layers drift apart a little as the page scrolls.
  */
-export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, collapsed = false, onFold, children }: SceneProps) {
+export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, collapsed = false, children }: SceneProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const flick = useRef<{ x: number; y: number; t: number } | null>(null)
   const [s0, s1, s2, far, near, sand, shade] = useMemo(() => palette(hour), [hour])
   const light = daylight(hour)
   const night = light < 0.25
@@ -147,30 +237,18 @@ export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, 
     }
   }, [])
 
+  // folded at night, the camp's ground comes up into view around a fire, with KATY beside it
+  const campfire = collapsed && phase === 'night'
+
   const tentColour = night ? '#2a2f45' : '#5a4636'
   const palmColour = night ? '#1c2438' : '#5e5a3c'
 
   return (
     <div
       ref={ref}
-      className={`scene scene-${phase}${darkSky ? ' scene-darksky' : ''}${dry ? ' is-dry' : ''}${collapsed ? ' is-collapsed' : ''}`}
-      onTouchStart={(e) => {
-        const p = e.touches[0]
-        flick.current = onFold && e.touches.length === 1 && window.scrollY < 4 ? { x: p.clientX, y: p.clientY, t: Date.now() } : null
-      }}
-      onTouchEnd={(e) => {
-        const f = flick.current
-        flick.current = null
-        if (!f || !onFold || Date.now() - f.t > 600) return
-        const p = e.changedTouches[0]
-        const dx = p.clientX - f.x
-        const dy = p.clientY - f.y
-        if (Math.abs(dy) < 44 || Math.abs(dy) < Math.abs(dx) * 1.5) return
-        if (dy < 0 && !collapsed) onFold(false)
-        else if (dy > 0 && collapsed) onFold(true)
-      }}
+      className={`scene scene-${phase}${darkSky ? ' scene-darksky' : ''}${dry ? ' is-dry' : ''}${collapsed ? ' is-collapsed' : ''}${campfire ? ' is-campfire' : ''}`}
     >
-      <svg className="scene-art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <svg className="scene-art" viewBox="0 0 400 300" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
         <defs>
           <linearGradient id="sc-sky" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor={s0} />
@@ -227,7 +305,7 @@ export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, 
           </g>
         )}
         {moon && night && (
-          <g transform={`translate(${moon.x.toFixed(1)} ${moon.y.toFixed(1)})`}>
+          <g className="sc-moon" transform={`translate(${moon.x.toFixed(1)} ${moon.y.toFixed(1)})`}>
             <circle r="22" fill="url(#sc-glow)" opacity=".35" />
             <circle r="11" fill="#f4ead2" />
             <circle cx="5" cy="-4" r="9.5" fill={s0} />
@@ -372,6 +450,9 @@ export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, 
           </g>
         )}
       </svg>
+      {campfire && <Campfire far={far} near={near} sand={sand} shade={shade} low={hour < 5} />}
+      {/* folded, there is no room for the sun or moon to travel their arc behind the words: they rest on the right */}
+      {collapsed && (moon && night ? <span className="scene-orb is-moon" aria-hidden="true" /> : sun ? <span className={`scene-orb is-sun${dry ? ' is-hot' : ''}`} aria-hidden="true" /> : null)}
       <div className="scene-stage">{children}</div>
     </div>
   )

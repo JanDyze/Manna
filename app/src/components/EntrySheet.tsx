@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLookups, useStore } from '../lib/store'
 import type { Tx } from '../lib/types'
@@ -12,6 +11,7 @@ import { Mascot, type MascotAction } from './Mascot'
 import { Thumb } from './Photo'
 import { AccountMark, TxAmount, txIcon, txTile } from './Bits'
 import { useToast } from './Toast'
+import { Sheet, type SheetHandle } from './Sheet'
 
 const longDate = (s: string) => fromISODate(s).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 
@@ -26,32 +26,12 @@ export function EntrySheet({ id, onClose }: { id: string; onClose: () => void })
   const nav = useNavigate()
   const toast = useToast()
   const t = data.transactions.find((x) => x.id === id)
-  const [leaving, setLeaving] = useState(false)
   const [confirm, setConfirm] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [drag, setDrag] = useState(0)
-  const dragFrom = useRef<number | null>(null)
-  const sheet = useRef<HTMLDivElement>(null)
+  const sheet = useRef<SheetHandle>(null)
 
   /** slide away, then let the page forget it */
-  function close() {
-    if (leaving) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return onClose()
-    setLeaving(true)
-    window.setTimeout(onClose, 200)
-  }
-
-  useEffect(() => {
-    const prev = document.activeElement as HTMLElement | null
-    const key = (e: KeyboardEvent) => e.key === 'Escape' && close()
-    document.addEventListener('keydown', key)
-    sheet.current?.focus({ preventScroll: true })
-    return () => {
-      document.removeEventListener('keydown', key)
-      prev?.focus?.({ preventScroll: true })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const close = () => sheet.current?.close()
 
   // "tap again to delete" quietly takes itself back
   useEffect(() => {
@@ -90,22 +70,6 @@ export function EntrySheet({ id, onClose }: { id: string; onClose: () => void })
     }
   }
 
-  // drag the top of the sheet down to put it away
-  function down(e: RPointerEvent<HTMLDivElement>) {
-    dragFrom.current = e.clientY
-    e.currentTarget.setPointerCapture(e.pointerId)
-  }
-  function move(e: RPointerEvent<HTMLDivElement>) {
-    if (dragFrom.current == null) return
-    setDrag(Math.max(0, e.clientY - dragFrom.current))
-  }
-  function up() {
-    if (dragFrom.current == null) return
-    dragFrom.current = null
-    if (drag > 90) close()
-    else setDrag(0)
-  }
-
   const cat = t.category_id ? look.category.get(t.category_id) : undefined
   const acc = look.account.get(t.account_id)
   const to = t.to_account_id ? look.account.get(t.to_account_id) : undefined
@@ -115,22 +79,25 @@ export function EntrySheet({ id, onClose }: { id: string; onClose: () => void })
   const history = t.affects_balance === false
   const note = insight(t, data, look)
 
-  return createPortal(
-    <>
-      <div className={`sheet-backdrop${leaving ? ' is-leaving' : ''}`} onClick={close} />
-      <div
-        ref={sheet}
-        tabIndex={-1}
-        className={`sheet entry-sheet${leaving ? ' is-leaving' : ''}${drag ? ' is-dragging' : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${entryTitle(t, look)} details`}
-        style={drag ? { transform: `translate(-50%, ${drag}px)` } : undefined}
-      >
-        <div className="sheet-drag" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-          <div className="sheet-grip" />
-        </div>
+  const actions = (
+    <div className="entry-actions">
+      <button type="button" className={`btn danger${confirm ? ' is-armed' : ''}`} onClick={del} disabled={busy} aria-label={confirm ? 'Tap again to delete' : 'Delete'}>
+        <Glyph name="trash" size={18} />
+        {confirm && <span>Tap again</span>}
+      </button>
+      {canCopy(t) && (
+        <button type="button" className="btn soft" onClick={again} disabled={busy}>
+          <Glyph name="repeat" size={18} /> Again today
+        </button>
+      )}
+      <button type="button" className="btn grow-btn" onClick={() => nav(`/add/${t.id}`)} disabled={busy}>
+        <Glyph name="pen" size={18} /> Edit
+      </button>
+    </div>
+  )
 
+  return (
+    <Sheet ref={sheet} label={`${entryTitle(t, look)} details`} className="entry-sheet" focus="sheet" onClose={onClose} foot={actions}>
         <div className="ticket-wrap">
           <article className={`ticket ticket-${t.kind}`}>
             <div className="ticket-top">
@@ -226,24 +193,7 @@ export function EntrySheet({ id, onClose }: { id: string; onClose: () => void })
             )}
           </article>
         </div>
-
-        <div className="entry-actions">
-          <button type="button" className={`btn danger${confirm ? ' is-armed' : ''}`} onClick={del} disabled={busy} aria-label={confirm ? 'Tap again to delete' : 'Delete'}>
-            <Glyph name="trash" size={18} />
-            {confirm && <span>Tap again</span>}
-          </button>
-          {canCopy(t) && (
-            <button type="button" className="btn soft" onClick={again} disabled={busy}>
-              <Glyph name="repeat" size={18} /> Again today
-            </button>
-          )}
-          <button type="button" className="btn grow-btn" onClick={() => nav(`/add/${t.id}`)} disabled={busy}>
-            <Glyph name="pen" size={18} /> Edit
-          </button>
-        </div>
-      </div>
-    </>,
-    document.body,
+    </Sheet>
   )
 }
 
