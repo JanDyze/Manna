@@ -7,7 +7,7 @@ import { applyTheme, getThemePref, type ThemePref } from '../lib/theme'
 import { mock } from '../lib/mock'
 import { goBack } from '../lib/back'
 import type { Account, AccountKind, Category, CategoryKind } from '../lib/types'
-import { balances, peso } from '../lib/money'
+import { balances, cardStatus, peso } from '../lib/money'
 import { ACCOUNT_ICON, ACCOUNT_KIND_LABEL, AccountMark, Tile, initials } from '../components/Bits'
 import { Glyph, PICKABLE } from '../components/Glyph'
 import { Sheet } from '../components/Sheet'
@@ -62,19 +62,33 @@ export function SettingsPage() {
       <section id="accounts">
         <p className="eyebrow" style={{ padding: '0 6px 8px' }}>Accounts</p>
         <ul className="card flush list">
-          {data.accounts.sort((a, b) => a.sort - b.sort).map((a) => (
+          {data.accounts.sort((a, b) => a.sort - b.sort).map((a) => {
+            const b = bal.get(a.id) ?? 0
+            const card = a.kind === 'card' ? cardStatus(a, b) : null
+            return (
             <li key={a.id}>
               <button className="item" onClick={() => setAccount(a)} style={a.archived ? { opacity: 0.55 } : undefined}>
                 <AccountMark name={a.name} kind={a.kind} tile />
                 <div className="grow">
                   <p className="item-title">{a.name}</p>
-                  <p className="item-sub">{ACCOUNT_KIND_LABEL[a.kind]}{a.archived ? ' · hidden' : ''}</p>
+                  <p className="item-sub ellipsis">
+                    {card?.left != null ? `${peso(card.left)} left to spend of ${peso(card.limit!)}` : ACCOUNT_KIND_LABEL[a.kind]}
+                    {a.archived ? ' · hidden' : ''}
+                  </p>
                 </div>
-                <span className="amount">{peso(bal.get(a.id) ?? 0)}</span>
+                {card && b < 0 ? (
+                  <span style={{ textAlign: 'right' }}>
+                    <span className="amount" style={{ display: 'block' }}>{peso(card.owed)}</span>
+                    <span className="tiny muted">owed</span>
+                  </span>
+                ) : (
+                  <span className="amount">{peso(b)}</span>
+                )}
                 <Glyph name="fwd" size={18} className="faint" />
               </button>
             </li>
-          ))}
+            )
+          })}
           <li>
             <button className="item gold" style={{ fontWeight: 600, justifyContent: 'center' }} onClick={() => setAccount('new')}>
               <Glyph name="plus" size={18} />
@@ -185,7 +199,15 @@ function AccountSheet({ account, onClose }: { account: Account | null; onClose: 
   const toast = useToast()
   const [name, setName] = useState(account?.name ?? '')
   const [kind, setKind] = useState<AccountKind>(account?.kind ?? 'ewallet')
-  const [opening, setOpening] = useState(account ? String(account.opening_balance) : '')
+  // a card's starting balance is entered as what was owed (a positive number); it's kept as a negative balance
+  const [opening, setOpening] = useState(account ? String(account.kind === 'card' ? -account.opening_balance : account.opening_balance) : '')
+  const [limit, setLimit] = useState(account?.credit_limit != null ? String(account.credit_limit) : '')
+  const card = kind === 'card'
+  function pickKind(k: AccountKind) {
+    // switching to or from a card flips what the number means (owed ↔ held)
+    if ((k === 'card') !== card && opening.trim() && Number(opening.replace(/[,\s₱]/g, ''))) setOpening(String(-Number(opening.replace(/[,\s₱]/g, ''))))
+    setKind(k)
+  }
   const [archived, setArchived] = useState(account?.archived ?? false)
   const [error, setError] = useState<string | null>(null)
   const used = account ? store.data.transactions.some((t) => t.account_id === account.id || t.to_account_id === account.id) : false
@@ -195,8 +217,18 @@ function AccountSheet({ account, onClose }: { account: Account | null; onClose: 
     if (!name.trim()) return setError('Name the account.')
     const raw = opening.replace(/[,\s₱]/g, '')
     const ob = raw === '' ? 0 : Number(raw)
-    if (!Number.isFinite(ob)) return setError('Starting balance should be a number (negative for card debt).')
-    const row = { name: name.trim(), kind, opening_balance: Math.round(ob * 100) / 100, archived }
+    if (!Number.isFinite(ob)) return setError(card ? 'What you owed should be a number.' : 'Starting balance should be a number.')
+    const rawLimit = limit.replace(/[,\s₱]/g, '')
+    const lim = card && rawLimit !== '' ? Number(rawLimit) : null
+    if (lim != null && (!Number.isFinite(lim) || lim <= 0)) return setError('The limit should be more than zero, or left blank.')
+    const row: Partial<Account> = {
+      name: name.trim(),
+      kind,
+      opening_balance: Math.round((card ? -ob : ob) * 100) / 100,
+      archived,
+      // only sent when used, so other accounts save the same way as before
+      ...((lim != null || account?.credit_limit != null) && { credit_limit: lim == null ? null : Math.round(lim * 100) / 100 }),
+    }
     try {
       if (account) await store.update('accounts', account.id, row)
       else await store.insert('accounts', { ...row, sort: store.data.accounts.length })
@@ -225,13 +257,20 @@ function AccountSheet({ account, onClose }: { account: Account | null; onClose: 
         </div>
         <div className="chips" role="group" aria-label="Type">
           {(Object.keys(ACCOUNT_KIND_LABEL) as AccountKind[]).map((k) => (
-            <button type="button" key={k} className="chip" aria-pressed={kind === k} onClick={() => setKind(k)}>
+            <button type="button" key={k} className="chip" aria-pressed={kind === k} onClick={() => pickKind(k)}>
               <Glyph name={ACCOUNT_ICON[k]} size={16} />
               {ACCOUNT_KIND_LABEL[k]}
             </button>
           ))}
         </div>
-        <MoneyField id="a-open" label="Balance when you started tracking" value={opening} onChange={setOpening} hint="Use a minus sign for what you owe on a credit card." />
+        {card ? (
+          <>
+            <MoneyField id="a-open" label="Owed when you started tracking" value={opening} onChange={setOpening} hint="What the app said you owed then. Purchases add to it and payments bring it down." />
+            <MoneyField id="a-limit" label="Credit limit (optional)" value={limit} onChange={setLimit} hint="Your total limit in the card's app, so Manna can show what's left to spend." />
+          </>
+        ) : (
+          <MoneyField id="a-open" label="Balance when you started tracking" value={opening} onChange={setOpening} />
+        )}
         {account && (
           <label className="switch">
             <input type="checkbox" checked={archived} onChange={(e) => setArchived(e.target.checked)} />

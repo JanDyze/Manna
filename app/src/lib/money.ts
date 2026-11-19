@@ -30,6 +30,28 @@ export function parseAmount(s: string): number | null {
 
 const round2 = (n: number) => Math.round(n * 100) / 100
 
+/** A card's standing: what's owed on it and, with a limit, what's left to spend. */
+export function cardStatus(a: Pick<Account, 'credit_limit'>, balance: number) {
+  const owed = round2(Math.max(0, -balance))
+  const limit = a.credit_limit ?? null
+  return { owed, limit, left: limit == null ? null : round2(Math.max(0, limit - owed)) }
+}
+
+/**
+ * The honest picture: money in your accounts (everything except what's owed on cards), what's owed on cards,
+ * and what's free to use (the first less the second). Card debt is real, so "free" never hides it.
+ */
+export function moneyPicture(accounts: Account[], bal: Map<string, number>) {
+  let have = 0
+  let owed = 0
+  for (const a of accounts) {
+    const b = bal.get(a.id) ?? 0
+    if (a.kind === 'card' && b < 0) owed -= b
+    else have += b
+  }
+  return { have: round2(have), owed: round2(owed), free: round2(have - owed) }
+}
+
 /** How each kind of transaction moves an account's balance. */
 /** Whether an entry moves money in an account. History-only entries (affects_balance = false) don't. */
 export const movesBalance = (t: Pick<Tx, 'affects_balance'>) => t.affects_balance !== false

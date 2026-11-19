@@ -17,6 +17,8 @@ export type Account = {
   opening_balance: number
   sort: number
   archived: boolean
+  /** cards: the spending limit, to show what's left to spend; null = not set */
+  credit_limit?: number | null
 }
 
 export type Category = { id: string; name: string; kind: CategoryKind; icon: string; sort: number; archived: boolean }

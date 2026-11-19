@@ -21,7 +21,7 @@ const EMPTY: Data = {
 }
 
 // Postgres numeric arrives as a string from some clients; keep money as numbers everywhere.
-const MONEY = ['opening_balance', 'amount', 'principal', 'target', 'tithe_percent', 'recorded', 'actual'] as const
+const MONEY = ['opening_balance', 'amount', 'principal', 'target', 'tithe_percent', 'recorded', 'actual', 'credit_limit'] as const
 function clean<T>(row: T): T {
   const r = { ...(row as Record<string, unknown>) }
   for (const k of MONEY) if (k in r && r[k] != null) r[k] = Number(r[k])

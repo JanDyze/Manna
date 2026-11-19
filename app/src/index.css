@@ -613,6 +613,8 @@ h1, h2, h3, p { margin: 0; }
 .wallet-acc-amt .cents { font-size: 11px; opacity: .6; }
 .wallet-acc-amt { font-size: 16px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wallet-acc:active .wallet-acc-amt { opacity: .7; }
+/* a card shows what's owed on it rather than a minus sign */
+.wallet-owed { font-size: 11px; font-weight: 500; opacity: .6; }
 .wallet-actions { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 14px 0 0; }
 .wallet-actions a { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 6px 0 2px; color: rgb(246 239 224 / 82%); text-decoration: none; font-size: 12px; font-weight: 500; border-radius: 14px; }
 .wallet-actions a > span { width: 44px; height: 44px; border-radius: 16px; display: grid; place-items: center; background: rgb(255 255 255 / 9%); color: #f6efe0; transition: transform .15s, background .15s; }

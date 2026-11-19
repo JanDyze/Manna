@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import { useAuth, firstName } from '../lib/auth'
-import { balances, debtLeft, goalSaved, monthPlan, monthTotals, peso, tithe, upcoming } from '../lib/money'
+import { balances, cardStatus, debtLeft, goalSaved, moneyPicture, monthPlan, monthTotals, peso, tithe, upcoming } from '../lib/money'
 import { daysBetween, dueLabel, fmtDate, fromISODate, greeting, monthLabel, shortDate, thisMonth, today } from '../lib/dates'
 import { demoHour, mock } from '../lib/mock'
 import { mood, verseOfTheDay } from '../lib/words'
@@ -64,7 +64,8 @@ export function TodayPage() {
 
   const bal = useMemo(() => balances(data.accounts, data.transactions), [data.accounts, data.transactions])
   const accounts = data.accounts.filter((a) => !a.archived).sort((a, b) => a.sort - b.sort)
-  const available = accounts.reduce((s, a) => s + (bal.get(a.id) ?? 0), 0)
+  const picture = moneyPicture(accounts, bal)
+  const available = picture.free
   const totals = useMemo(() => monthTotals(data.transactions, month), [data.transactions, month])
   const plan = monthPlan(data.budgets, totals, t)
   const over = plan.total > 0 && plan.left < 0
@@ -163,7 +164,7 @@ export function TodayPage() {
           )}
         </Link>
 
-        <Wallet available={available} accounts={accounts} bal={bal} />
+        <Wallet available={available} have={picture.have} owed={picture.owed} accounts={accounts} bal={bal} />
 
         <Link to="/plan/budgets" className="card card-link spend-card">
           {plan.total > 0 ? (
@@ -337,7 +338,7 @@ function useCountUp(value: number, ms = 700) {
  * The main card: everything you have right now, and in which accounts. Navy and gold like the logo; kept
  * quiet on purpose (adding is the gold + below, the month's numbers are in the spending card).
  */
-function Wallet({ available, accounts, bal }: { available: number; accounts: Account[]; bal: Map<string, number> }) {
+function Wallet({ available, have, owed, accounts, bal }: { available: number; have: number; owed: number; accounts: Account[]; bal: Map<string, number> }) {
   const [hidden, toggle] = useHidden()
   const [showAll, setShowAll] = useState(false)
   const shown = useCountUp(available)
@@ -347,7 +348,15 @@ function Wallet({ available, accounts, bal }: { available: number; accounts: Acc
         <span className="wallet-mark"><AccountMark name={a.name} kind={a.kind} size={18} /></span>
         <span className="ellipsis">{a.name}</span>
       </span>
-      <span className="wallet-acc-amt num"><Secret hidden={hidden} text={peso(bal.get(a.id) ?? 0)} flakes={4} delay={180 + Math.min(i, 5) * 70} /></span>
+      {a.kind === 'card' && (bal.get(a.id) ?? 0) < 0 ? (
+        // a card shows what's owed on it, not a minus sign
+        <span className="wallet-acc-amt num owed">
+          <Secret hidden={hidden} text={peso(cardStatus(a, bal.get(a.id) ?? 0).owed)} flakes={4} delay={180 + Math.min(i, 5) * 70} />
+          <span className="wallet-owed"> owed</span>
+        </span>
+      ) : (
+        <span className="wallet-acc-amt num"><Secret hidden={hidden} text={peso(bal.get(a.id) ?? 0)} flakes={4} delay={180 + Math.min(i, 5) * 70} /></span>
+      )}
     </Link>
   )
   return (
@@ -359,12 +368,17 @@ function Wallet({ available, accounts, bal }: { available: number; accounts: Acc
         <path className="wallet-star" d="M326 16 Q328 28 339 33 Q326 33 322 45 Q319 35 307 33 Q322 30 326 16Z" />
       </svg>
       <div className="wallet-head">
-        <p className="eyebrow">Available now</p>
+        <p className="eyebrow">{owed > 0 ? 'Free to use' : 'Available now'}</p>
         <EyeToggle className="wallet-eye" hidden={hidden} onToggle={toggle} />
       </div>
       <p className="wallet-total num">
         <Secret hidden={hidden} text={peso(Math.round(shown * 100) / 100)} centsClass="wallet-cents" flakes={6} />
       </p>
+      {owed > 0 && (
+        <p className="wallet-sub num">
+          <Secret hidden={hidden} text={peso(have)} flakes={3} /> in your accounts · <Secret hidden={hidden} text={peso(owed)} flakes={3} /> owed on cards
+        </p>
+      )}
       <div className="wallet-accounts">{accounts.slice(0, 3).map(acc)}</div>
       {accounts.length > 3 && (
         <>

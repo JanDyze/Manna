@@ -26,6 +26,7 @@ export const RELEASES: Release[] = [
       { icon: 'receipt', text: 'Tap an entry to see it as a little receipt. Press and hold to pick several and view, edit, copy or delete them together.' },
       { icon: 'repeat', text: 'Drag entries to put them in order within a day.' },
       { icon: 'card', text: 'Card payment bills remind you before each installment, and bills can end after their last payment.' },
+      { icon: 'card', text: 'Cards and pay-later (Atome, SPayLater) show what you owe and what’s left to spend, and Today shows what’s truly free to use after card debt.' },
       { icon: 'check', text: '“Already in my balance” records past entries for the history without changing your balances.' },
       { icon: 'message', text: 'Claude can now do everything the app can, from entries to bills and goals.' },
     ],

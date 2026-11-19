@@ -42,7 +42,7 @@ export function mockData(): Data {
     { id: id('acc'), name: 'Wallet', kind: 'cash', opening_balance: 1800, sort: 0, archived: false },
     { id: id('acc'), name: 'GCash', kind: 'ewallet', opening_balance: 4800, sort: 1, archived: false },
     { id: id('acc'), name: 'BDO', kind: 'bank', opening_balance: 9500, sort: 2, archived: false },
-    { id: id('acc'), name: 'Atome', kind: 'card', opening_balance: -2000, sort: 3, archived: false },
+    { id: id('acc'), name: 'Atome', kind: 'card', opening_balance: -2000, sort: 3, archived: false, credit_limit: 8000 },
   ]
   const [wallet, gcash, bank, atome] = accounts
   // a brand-new user starts with the defaults and nothing in them yet
