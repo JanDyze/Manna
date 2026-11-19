@@ -18,6 +18,16 @@ export type Release = {
  */
 export const RELEASES: Release[] = [
   {
+    version: '0.4.0',
+    date: '2026-11-19',
+    title: 'Every entry wears its own icon',
+    notes: [
+      { icon: 'chicken', text: 'Entries pick an icon from what they say: Jollibee and McDo get fried chicken, gasoline a fuel pump, a Shopee order whatever you bought. The rest keep their category’s icon.' },
+      { icon: 'hotcoffee', text: 'New icons: fried chicken, a hot coffee mug, iced coffee, and a scooter in the Burgman’s shape.' },
+      { icon: 'list', text: 'Arranging a day’s entries shows just their names and the handle, without the amounts crowding in.' },
+    ],
+  },
+  {
     version: '0.3.0',
     date: '2026-11-19',
     title: 'Feels like an app now',

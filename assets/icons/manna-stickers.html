@@ -42,12 +42,18 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-noodles .lift { animation: ic-hop 0.7s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-burger .top { transform-box: fill-box; transform-origin: center; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-burger .top { animation: ic-hop 0.65s cubic-bezier(.3,.7,.4,1) 0s both; }
+.ic-chicken .leg { transform-origin: 12px 12px; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-chicken .leg { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-pizza > .ic-body { transform-origin: 12px 21px; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-pizza > .ic-body { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-hotcoffee .steam:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(1) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-hotcoffee .steam:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
-:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.18s both; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.15s both; }
+.ic-hotcoffee .steam:nth-of-type(3) { transform-box: fill-box; transform-origin: center; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .steam:nth-of-type(3) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.3s both; }
+.ic-hotcoffee .beat { transform-origin: 10.9px 15px; }
+:is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-hotcoffee .beat { animation: ic-beat 0.9s cubic-bezier(.3,.7,.4,1) 0.1s both; }
 .ic-icedcoffee .ice:nth-of-type(1) { transform-box: fill-box; transform-origin: center; }
 :is(.nav-tab.active, .cat-btn[aria-pressed='true'], .chip[aria-pressed='true'], .icon-pick[aria-pressed='true'], .ic-play) .ic-icedcoffee .ice:nth-of-type(1) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
 .ic-icedcoffee .ice:nth-of-type(2) { transform-box: fill-box; transform-origin: center; }
@@ -332,9 +338,12 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
   :is(a:hover, button:hover) .ic-rice > .ic-body { animation: ic-bounce 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-noodles .lift { animation: ic-hop 0.7s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-burger .top { animation: ic-hop 0.65s cubic-bezier(.3,.7,.4,1) 0s both; }
+  :is(a:hover, button:hover) .ic-chicken .leg { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-pizza > .ic-body { animation: ic-swing 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(1) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0s both; }
-  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.18s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(2) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.15s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .steam:nth-of-type(3) { animation: ic-steam 0.9s cubic-bezier(.3,.7,.4,1) 0.3s both; }
+  :is(a:hover, button:hover) .ic-hotcoffee .beat { animation: ic-beat 0.9s cubic-bezier(.3,.7,.4,1) 0.1s both; }
   :is(a:hover, button:hover) .ic-icedcoffee .ice:nth-of-type(1) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0s both; }
   :is(a:hover, button:hover) .ic-icedcoffee .ice:nth-of-type(2) { animation: ic-hop 0.6s cubic-bezier(.3,.7,.4,1) 0.12s both; }
   :is(a:hover, button:hover) .ic-icedcoffee .fill { animation: ic-fill 0.8s cubic-bezier(.3,.7,.4,1) 0s both; }
@@ -489,7 +498,7 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 @keyframes ic-turnkey { 0%, 100% { transform: rotate(0); } 40% { transform: rotate(-28deg); } 70% { transform: rotate(4deg); } }
 
 </style></head><body><main>
-<h1>Manna stickers</h1><p>95 more icons in Manna's family: navy strokes, a gold accent, and a little move each. Tap one to play it; they also take turns on their own.</p>
+<h1>Manna stickers</h1><p>96 more icons in Manna's family: navy strokes, a gold accent, and a little move each. Tap one to play it; they also take turns on their own.</p>
 <label><input type="checkbox" id="dk"> Night</label>
 <h2>Food & drink</h2><div class="grid"><button type="button" class="cell"><svg class="ic ic-rice" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><path class="ic-a" d="M6 11.5c.6-2.6 3-4.2 6-4.2s5.4 1.6 6 4.2Z"/>
 <path d="M3.6 11.5h16.8a8.4 7.4 0 0 1-16.8 0Z"/>
@@ -499,7 +508,10 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 <path d="M3.6 11.5h16.8a8.4 7.4 0 0 1-16.8 0Z"/>
 <path d="M9.4 20.4h5.2"/></svg><span>noodles</span></button><button type="button" class="cell"><svg class="ic ic-burger" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="top" d="M4.4 10.2a7.6 5.6 0 0 1 15.2 0Z"/>
 <rect class="ic-af" x="3.6" y="12" width="16.8" height="2.6" rx="1.3"/>
-<path d="M4.4 16.4h15.2v1.2a2.2 2.2 0 0 1-2.2 2.2H6.6a2.2 2.2 0 0 1-2.2-2.2Z"/></svg><span>burger</span></button><button type="button" class="cell"><svg class="ic ic-pizza" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><circle class="ic-a" cx="10" cy="9.6" r="1.4"/><circle class="ic-a" cx="14.2" cy="10.6" r="1.2"/><circle class="ic-a" cx="12" cy="14.4" r="1.1"/>
+<path d="M4.4 16.4h15.2v1.2a2.2 2.2 0 0 1-2.2 2.2H6.6a2.2 2.2 0 0 1-2.2-2.2Z"/></svg><span>burger</span></button><button type="button" class="cell"><svg class="ic ic-chicken" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="leg"><path class="ic-af" d="M9.6 14.4c-1.7-1.7-1.6-4.8.5-7 2.4-2.5 6.3-3 8.5-.8s1.7 6.1-.8 8.5c-2.2 2.1-5.3 2.2-7 .5Z"/>
+<path d="M13.2 8.6l.7.7M16 10.6l.7.7M12.4 11.8l.7.7"/>
+<path d="M10.2 13.8 6.4 17.6"/>
+<circle cx="5.1" cy="17.2" r="1.35"/><circle cx="6.8" cy="18.9" r="1.35"/></g></svg><span>chicken</span></button><button type="button" class="cell"><svg class="ic ic-pizza" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><circle class="ic-a" cx="10" cy="9.6" r="1.4"/><circle class="ic-a" cx="14.2" cy="10.6" r="1.2"/><circle class="ic-a" cx="12" cy="14.4" r="1.1"/>
 <path d="M12 21.2 3.6 5.6a17 17 0 0 1 16.8 0Z"/>
 <path d="M4.8 7.8a15 15 0 0 1 14.4 0"/></g></svg><span>pizza</span></button><button type="button" class="cell"><svg class="ic ic-bread" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><g class="ic-body"><path d="M5 11.2a3.4 3.4 0 0 1 .8-6.6h12.4a3.4 3.4 0 0 1 .8 6.6V19a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1Z"/>
 <path class="ic-a" d="M8 12.2h8v4.8a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1Z"/></g></svg><span>bread</span></button><button type="button" class="cell"><svg class="ic ic-egg" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M8.4 4.4c3-1.6 6.2-.4 7.6 1.8 1.6 2.4 4.6 2.4 4.6 6.2 0 4.4-4.2 7.6-8.6 7.6-5 0-8.6-3-8.6-7 0-3.6 2.4-7 5-8.6Z"/>
@@ -513,10 +525,11 @@ label { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 8px;
 <path d="M12 12V8.2"/>
 <path class="ic-af flame" d="M12 3.2c1.3 1.2 1.4 2.6 0 3.6-1.4-1-1.3-2.4 0-3.6Z"/></svg><span>cake</span></button><button type="button" class="cell"><svg class="ic ic-icecream" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M7.8 11.4 12 21.2l4.2-9.8M9.2 14.6h5.6"/>
 <path class="ic-af scoop" d="M7.6 11.4a4.4 4.4 0 1 1 8.8 0Z"/>
-<circle cx="12" cy="5.4" r="1" fill="currentColor" stroke="none"/></svg><span>icecream</span></button><button type="button" class="cell"><svg class="ic ic-hotcoffee" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="steam" d="M10.2 4.4c-.8-.8.7-1.6-.1-2.8"/>
-<path class="steam" d="M13.8 4.4c-.8-.8.7-1.6-.1-2.8"/>
-<path class="ic-a" d="M7.45 11.6h9.1l-.42 4.6H7.87Z"/>
-<path d="M7 8h10l-1.2 12.2a1.4 1.4 0 0 1-1.4 1.2H9.6a1.4 1.4 0 0 1-1.4-1.2ZM6.2 8h11.6l-.6-2.2H6.8Z"/></svg><span>hotcoffee</span></button><button type="button" class="cell"><svg class="ic ic-icedcoffee" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="ic-a fill" d="M7.6 12.8h8.8l-.82 7.1a1 1 0 0 1-1 .9H9.42a1 1 0 0 1-1-.9Z"/>
+<circle cx="12" cy="5.4" r="1" fill="currentColor" stroke="none"/></svg><span>icecream</span></button><button type="button" class="cell"><svg class="ic ic-hotcoffee" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="steam" d="M8.4 6.8c-.8-.8.7-1.6-.1-2.8"/>
+<path class="steam" d="M11 6.8c-.8-.8.7-1.6-.1-2.8"/>
+<path class="steam" d="M13.6 6.8c-.8-.8.7-1.6-.1-2.8"/>
+<path d="M5.4 9h11v6.8a4.4 4.4 0 0 1-4.4 4.4H9.8a4.4 4.4 0 0 1-4.4-4.4ZM16.4 10.8h1.2a2.4 2.4 0 0 1 0 4.8h-1.3"/>
+<path class="ic-a beat" d="M10.9 17.4s-2.3-1.4-2.3-3a1.2 1.2 0 0 1 2.3-.5 1.2 1.2 0 0 1 2.3.5c0 1.6-2.3 3-2.3 3Z"/></svg><span>hotcoffee</span></button><button type="button" class="cell"><svg class="ic ic-icedcoffee" viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path class="ic-a fill" d="M7.6 12.8h8.8l-.82 7.1a1 1 0 0 1-1 .9H9.42a1 1 0 0 1-1-.9Z"/>
 <rect class="ice" x="8.7" y="10" width="2.7" height="2.7" rx=".6" transform="rotate(-14 10.05 11.35)"/>
 <rect class="ice" x="12.4" y="10.6" width="2.5" height="2.5" rx=".6" transform="rotate(16 13.65 11.85)"/>
 <path d="M6.8 8.4h10.4l-1.3 11.6a1.6 1.6 0 0 1-1.6 1.4H9.7a1.6 1.6 0 0 1-1.6-1.4ZM6.2 8.4c0-1.1.8-1.8 2-1.8h7.6c1.2 0 2 .7 2 1.8Z"/>

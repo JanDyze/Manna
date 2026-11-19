@@ -38,6 +38,13 @@ icon('burger', `
 <path d="M4.4 16.4h15.2v1.2a2.2 2.2 0 0 1-2.2 2.2H6.6a2.2 2.2 0 0 1-2.2-2.2Z"/>
 `, ['.top', 'ic-hop', 0.65, null, 0])
 
+icon('chicken', `
+<g class="leg"><path class="ic-af" d="M9.6 14.4c-1.7-1.7-1.6-4.8.5-7 2.4-2.5 6.3-3 8.5-.8s1.7 6.1-.8 8.5c-2.2 2.1-5.3 2.2-7 .5Z"/>
+<path d="M13.2 8.6l.7.7M16 10.6l.7.7M12.4 11.8l.7.7"/>
+<path d="M10.2 13.8 6.4 17.6"/>
+<circle cx="5.1" cy="17.2" r="1.35"/><circle cx="6.8" cy="18.9" r="1.35"/></g>
+`, ['.leg', 'ic-swing', 0.8, '12px 12px', 0])
+
 icon('pizza', `
 <circle class="ic-a" cx="10" cy="9.6" r="1.4"/><circle class="ic-a" cx="14.2" cy="10.6" r="1.2"/><circle class="ic-a" cx="12" cy="14.4" r="1.1"/>
 <path d="M12 21.2 3.6 5.6a17 17 0 0 1 16.8 0Z"/>
@@ -45,11 +52,12 @@ icon('pizza', `
 `, ['', 'ic-swing', 0.8, '12px 21px', 0])
 
 icon('hotcoffee', `
-<path class="steam" d="M10.2 4.4c-.8-.8.7-1.6-.1-2.8"/>
-<path class="steam" d="M13.8 4.4c-.8-.8.7-1.6-.1-2.8"/>
-<path class="ic-a" d="M7.45 11.6h9.1l-.42 4.6H7.87Z"/>
-<path d="M7 8h10l-1.2 12.2a1.4 1.4 0 0 1-1.4 1.2H9.6a1.4 1.4 0 0 1-1.4-1.2ZM6.2 8h11.6l-.6-2.2H6.8Z"/>
-`, ['.steam:nth-of-type(1)', 'ic-steam', 0.9, null, 0], ['.steam:nth-of-type(2)', 'ic-steam', 0.9, null, 0.18])
+<path class="steam" d="M8.4 6.8c-.8-.8.7-1.6-.1-2.8"/>
+<path class="steam" d="M11 6.8c-.8-.8.7-1.6-.1-2.8"/>
+<path class="steam" d="M13.6 6.8c-.8-.8.7-1.6-.1-2.8"/>
+<path d="M5.4 9h11v6.8a4.4 4.4 0 0 1-4.4 4.4H9.8a4.4 4.4 0 0 1-4.4-4.4ZM16.4 10.8h1.2a2.4 2.4 0 0 1 0 4.8h-1.3"/>
+<path class="ic-a beat" d="M10.9 17.4s-2.3-1.4-2.3-3a1.2 1.2 0 0 1 2.3-.5 1.2 1.2 0 0 1 2.3.5c0 1.6-2.3 3-2.3 3Z"/>
+`, ['.steam:nth-of-type(1)', 'ic-steam', 0.9, null, 0], ['.steam:nth-of-type(2)', 'ic-steam', 0.9, null, 0.15], ['.steam:nth-of-type(3)', 'ic-steam', 0.9, null, 0.3], ['.beat', 'ic-beat', 0.9, '10.9px 15px', 0.1])
 
 icon('icedcoffee', `
 <path class="ic-a fill" d="M7.6 12.8h8.8l-.82 7.1a1 1 0 0 1-1 .9H9.42a1 1 0 0 1-1-.9Z"/>
@@ -591,7 +599,7 @@ const KEYFRAMES = `
 
 // ---------- the icon picker's groups: the original set and this one together ----------
 export const GROUPS = [
-  ['Food & drink', ['food', 'rice', 'noodles', 'burger', 'pizza', 'bread', 'egg', 'fish', 'apple', 'cake', 'icecream', 'coffee', 'hotcoffee', 'icedcoffee', 'milktea', 'drink', 'basket', 'cart']],
+  ['Food & drink', ['food', 'rice', 'noodles', 'burger', 'chicken', 'pizza', 'bread', 'egg', 'fish', 'apple', 'cake', 'icecream', 'coffee', 'hotcoffee', 'icedcoffee', 'milktea', 'drink', 'basket', 'cart']],
   ['Getting around', ['transport', 'jeep', 'bus', 'motor', 'bike', 'car', 'train', 'boat', 'plane', 'fuel', 'pin']],
   ['Home & bills', ['home', 'bolt', 'water', 'wifi', 'flame', 'bulb', 'plug', 'phone', 'tv', 'key', 'sofa', 'laundry', 'fan', 'paid', 'date', 'repeat', 'tool']],
   ['Shopping & care', ['bag', 'shirt', 'shoe', 'tag', 'box', 'beauty', 'scissors', 'gem', 'gift']],

@@ -1,3 +1,4 @@
+import { iconFromNote } from '../lib/entryIcon'
 import { brandFor } from '../lib/banks'
 import type { Account, Category, Tx } from '../lib/types'
 import { peso } from '../lib/money'
@@ -26,11 +27,15 @@ export function TxAmount({ tx }: { tx: Tx }) {
   return <span className={`amount ${cls}`}>{sign}{peso(tx.amount)}</span>
 }
 
+/**
+ * An entry's icon. Transfers and loans show which way the money went; anything else shows what its words
+ * point to ("Jollibee" → fried chicken, lib/entryIcon.ts), or else its category's icon.
+ */
 export function txIcon(tx: Tx, cat?: Category): string {
   if (tx.kind === 'transfer') return 'swap'
   if (tx.kind === 'debt_in') return 'down'
   if (tx.kind === 'debt_out') return 'up'
-  return cat?.icon ?? 'dot'
+  return iconFromNote(tx.note) ?? cat?.icon ?? 'dot'
 }
 
 export function txTile(tx: Tx): string {
