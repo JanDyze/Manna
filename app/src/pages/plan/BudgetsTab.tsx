@@ -28,22 +28,23 @@ export function BudgetsTab() {
   const daysInMonth = day + daysLeftInMonth(t) - 1
   const pace = (plan.total * day) / daysInMonth
   const overs = uses.filter((u) => u.pct > 100)
+  // how far through the month today is: the tick on each bar shows where an even pace would be
+  const evenPct = (day / daysInMonth) * 100
 
   return (
     <>
       {data.budgets.length > 0 ? (
-        <section className="card">
+        <section className="hero">
           <p className="eyebrow">{fromISODate(t).toLocaleDateString('en-PH', { month: 'long' })} budget</p>
-          <p className="num" style={{ marginTop: 4 }}>
-            <span className="mid-num">{plan.left < 0 ? peso(-plan.left) : peso(plan.left)}</span>{' '}
-            <span className="muted">{plan.left < 0 ? 'over' : 'left'} of {peso(plan.total)}</span>
+          <p className="hero-big num">
+            {plan.left < 0 ? peso(-plan.left) : peso(plan.left)} <span className="hero-of">{plan.left < 0 ? 'over' : 'left'} of {peso(plan.total)}</span>
           </p>
-          <div style={{ margin: '12px 0 8px' }}>
-            <Bar pct={plan.pct} thick tone={plan.left < 0 ? 'bad' : plan.pct > 85 ? 'gold' : undefined} label="Spent of this month's budget" />
+          <div className="hero-meter">
+            <Bar pct={plan.pct} thick tone={plan.left < 0 ? 'bad' : plan.pct > 85 ? 'gold' : undefined} mark={evenPct} label="Spent of this month's budget" />
           </div>
-          <div className="row small muted" style={{ justifyContent: 'space-between' }}>
-            <span>Day {day} of {daysInMonth}</span>
-            <span>{plan.spent <= pace ? 'On track' : `${peso(Math.round(plan.spent - pace))} ahead of plan`}</span>
+          <div className="hero-foot">
+            <span>{plan.left > 0 ? `${peso(Math.floor(plan.perDay))} a day · ${plan.days} ${plan.days === 1 ? 'day' : 'days'} to go` : `Day ${day} of ${daysInMonth}`}</span>
+            <span className={plan.spent <= pace ? 'is-ok' : 'is-warn'}>{plan.spent <= pace ? 'On track' : `${peso(Math.round(plan.spent - pace))} ahead of plan`}</span>
           </div>
         </section>
       ) : (
@@ -74,7 +75,7 @@ export function BudgetsTab() {
                     <span className={`pill${u.pct > 100 ? ' bad' : u.pct >= 85 ? ' gold' : ''}`}>{Math.round(u.pct)}%</span>
                   </div>
                   <div style={{ margin: '7px 0 5px' }}>
-                    <Bar pct={u.pct} tone={budgetTone(u.pct)} />
+                    <Bar pct={u.pct} tone={budgetTone(u.pct)} mark={evenPct} />
                   </div>
                   <p className="item-sub num">
                     {peso(u.spent)} of {peso(u.budget.amount)} ·{' '}
@@ -88,9 +89,17 @@ export function BudgetsTab() {
       )}
 
       {unbudgeted.length > 0 && (
-        <p className="small muted" style={{ padding: '0 4px' }}>
-          Spent without a budget: {unbudgeted.map((u) => `${u.c.name} ${peso(u.spent)}`).join(' · ')}
-        </p>
+        <div className="unbudgeted">
+          <p className="eyebrow">Spent without a budget</p>
+          <div className="chips">
+            {unbudgeted.map((u) => (
+              <span key={u.c.id} className="pill">
+                <Glyph name={u.c.icon} size={14} />
+                {u.c.name} <span className="num">{peso(u.spent)}</span>
+              </span>
+            ))}
+          </div>
+        </div>
       )}
 
       <button className="btn soft block" onClick={() => setEditing('new')}>

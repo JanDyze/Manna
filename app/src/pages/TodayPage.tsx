@@ -119,7 +119,7 @@ export function TodayPage() {
 
   return (
     <>
-      <Scene hour={hourExact} manna={mannaShare} dry={over} pace={pace} festive={t.slice(5, 7) === '12'} jar={goals.length ? goalSavedSum / Math.max(goalTarget, 1) : null} quail={recentIncome} onJar={() => nav('/plan/goals')} collapsed={folded}>
+      <Scene hour={hourExact} manna={mannaShare} dry={over} pace={pace} festive={t.slice(5, 7) === '12'} jar={goals.length ? goalSavedSum / Math.max(goalTarget, 1) : null} quail={recentIncome} onJar={() => nav('/plan/goals')} collapsed={folded} onFold={(open) => open === folded && fold()}>
         <div className="scene-top">
           <div className="scene-greet">
             <Brand size={24} />
@@ -147,21 +147,26 @@ export function TodayPage() {
       </Scene>
 
       <div className="page" style={{ paddingTop: 0 }}>
-        <Link to="/plan/budgets" className="scene-legend small" style={{ textDecoration: 'none', color: 'inherit' }}>
+        {/* the manna on the ground, in numbers: what's left of the month's budget and what that makes each day */}
+        <Link to="/plan/budgets" className={`manna-strip${over ? ' is-over' : ''}`}>
+          <span className="manna-strip-icon" aria-hidden="true"><Glyph name={over ? 'sun' : 'wheat'} size={18} /></span>
           {plan.total > 0 ? (
             over ? (
-              <span className="bad">The ground is bare: {peso(-plan.left)} over budget</span>
+              <span className="grow">The ground is bare: <strong className="num">{peso(-plan.left)}</strong> over budget</span>
             ) : (
               <>
-                <span className="muted">Manna left this month</span>
-                <span className="num">
-                  <strong>{peso(plan.left)}</strong> <span className="muted">· {peso(Math.floor(plan.perDay))}/day</span>
+                <span className="grow manna-strip-label">Manna left this month</span>
+                <span className="num manna-strip-amt">
+                  <strong>{peso(plan.left)}</strong>
+                  <small>{peso(Math.floor(plan.perDay))} a day</small>
                 </span>
               </>
             )
           ) : (
-            <span className="muted">Set a budget to see manna on the ground →</span>
+            <span className="grow manna-strip-label">Set a budget to see manna on the ground</span>
           )}
+          <Glyph name="fwd" size={16} className="faint" />
+          {plan.total > 0 && !over && <span className="manna-strip-meter" style={{ '--k': mannaShare ?? 0 } as CSSProperties} aria-hidden="true" />}
         </Link>
 
         <Wallet available={available} have={picture.have} owed={picture.owed} accounts={accounts} bal={bal} />

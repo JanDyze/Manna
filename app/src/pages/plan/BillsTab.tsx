@@ -29,6 +29,9 @@ export function BillsTab() {
   const cat = (id: string | null) => data.categories.find((c) => c.id === id)
   const acc = (id: string | null) => data.accounts.find((a) => a.id === id)
 
+  // the next bill going out, for the line under the total
+  const nextOut = active.filter((r) => r.kind !== 'income').sort((a, b) => a.next_due.localeCompare(b.next_due))[0]
+
   async function pay(r: Recurring) {
     setBusy(r.id)
     try {
@@ -44,15 +47,20 @@ export function BillsTab() {
   return (
     <>
       {active.length > 0 ? (
-        <section className="card quiet row" style={{ background: 'var(--gold-soft)' }}>
+        <section className="hero hero-row">
           <div className="grow">
             <p className="eyebrow">Due in the next 30 days</p>
-            <p className="mid-num num" style={{ marginTop: 2 }}>{peso(due30)}</p>
+            <p className="hero-big num">{peso(due30)}</p>
+            {nextOut && (
+              <p className="hero-sub">
+                Next: {nextOut.title} · {daysBetween(t, nextOut.next_due) <= 0 ? 'today' : `in ${daysBetween(t, nextOut.next_due)} ${daysBetween(t, nextOut.next_due) === 1 ? 'day' : 'days'}`}
+              </p>
+            )}
           </div>
           {in30 > 0 && (
-            <div style={{ textAlign: 'right' }}>
-              <p className="tiny muted">Expected in</p>
-              <p className="num good" style={{ fontWeight: 600 }}>{peso(in30)}</p>
+            <div className="hero-side">
+              <p className="eyebrow">Expected in</p>
+              <p className="num hero-in">{peso(in30)}</p>
             </div>
           )}
         </section>

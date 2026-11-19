@@ -7,7 +7,9 @@ import { parseAmount, peso } from '../lib/money'
 import type { AccountKind, Category } from '../lib/types'
 import { Mascot, type MascotAction } from '../components/Mascot'
 import { LogoAnimated } from '../components/LogoAnimated'
-import { Glyph, PICKABLE } from '../components/Glyph'
+import { Glyph } from '../components/Glyph'
+import { IconPicker } from '../components/IconPicker'
+import { useSwipe } from '../lib/swipe'
 import { ACCOUNT_ICON, ACCOUNT_KIND_LABEL, AccountMark } from '../components/Bits'
 import { BRANDS, brandFor } from '../lib/banks'
 import { useToast } from '../components/Toast'
@@ -88,6 +90,9 @@ export function OnboardingPage({ again = false }: { again?: boolean }) {
 
   const index = STEPS.indexOf(step)
   const go = (d: 1 | -1) => setStep(STEPS[Math.max(0, Math.min(STEPS.length - 1, index + d))])
+  // swiping moves between steps like Back and Next do (Next waits for at least one account)
+  const canNext = step !== 'done' && !(step === 'accounts' && !accounts.some((a) => a.on))
+  const swipe = useSwipe(canNext ? () => go(1) : undefined, index > 0 ? () => go(-1) : undefined, !saving)
 
   const budgetTotal = useMemo(() => cats.filter((c) => c.on).reduce((s, c) => s + (parseAmount(c.budget) ?? 0), 0), [cats])
   const others = (kind: Category['kind']) => data.categories.filter((c) => c.kind === kind && !c.archived).map((c) => c.name)
@@ -189,7 +194,7 @@ export function OnboardingPage({ again = false }: { again?: boolean }) {
         </div>
       </header>
 
-      <main className="onb-body" key={step}>
+      <main className="onb-body" key={step} {...swipe}>
         {step === 'welcome' && (
           <>
             <div className="onb-hero">
@@ -335,13 +340,7 @@ export function OnboardingPage({ again = false }: { again?: boolean }) {
             {newCat && (
               <div className="card stack">
                 <input className="input" autoFocus placeholder="Name, like Pets or School" value={newCat.name} onChange={(e) => setNewCat({ ...newCat, name: e.target.value })} onKeyDown={(e) => e.key === 'Enter' && addCategory()} maxLength={40} />
-                <div className="onb-icons" role="group" aria-label="Icon">
-                  {PICKABLE.map((ic) => (
-                    <button type="button" key={ic} className="chip" aria-pressed={newCat.icon === ic} aria-label={ic} onClick={() => setNewCat({ ...newCat, icon: ic })}>
-                      <Glyph name={ic} size={18} />
-                    </button>
-                  ))}
-                </div>
+                <IconPicker value={newCat.icon} onChange={(ic) => setNewCat({ ...newCat, icon: ic })} />
                 <div className="row">
                   <button className="btn soft sm grow" onClick={() => setNewCat(null)}>Cancel</button>
                   <button className="btn sm grow" onClick={addCategory} disabled={!newCat.name.trim()}>Add</button>

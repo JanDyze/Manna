@@ -1157,3 +1157,149 @@ html:has(.sheet-backdrop) [data-scroller] { overflow: hidden; }
 .sheet-backdrop { touch-action: none; }
 /* scrolling to the end of a long drawer stops there instead of carrying on into the page */
 .sheet { overscroll-behavior: contain; }
+
+/* ---------- the on-screen keyboard (lib/keyboard.ts sets --kb and --vvh) ---------- */
+/* drawers ride on top of the keyboard and shrink to the space left, so their fields can always be reached */
+.sheet { bottom: var(--kb, 0px); max-height: min(92dvh, calc(var(--vvh, 100dvh) - 12px)); }
+.sheet.chat { height: min(86dvh, 720px, calc(var(--vvh, 100dvh) - 12px)); }
+/* on a phone, the tab bar and the pick bar step aside while typing instead of floating over the field */
+@media (pointer: coarse) {
+  html.is-typing .nav { opacity: 0; pointer-events: none; transform: translate(-50%, 12px); }
+  html.is-typing .pick-bar { opacity: 0; pointer-events: none; }
+}
+
+/* ---------- the icon picker: every icon, in groups ---------- */
+.icon-picker { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.icon-groups { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 2px 16px; scroll-padding: 0 16px; }
+.icon-groups::-webkit-scrollbar { display: none; }
+.icon-group {
+  flex: none; position: relative; min-height: 34px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink-2); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.icon-group[aria-selected='true'] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.icon-group-dot { width: 6px; height: 6px; border-radius: 99px; background: var(--gold); }
+.icon-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 6px; padding: 10px; border-radius: 18px;
+  background: var(--sand); touch-action: pan-y; animation: step-in .25s cubic-bezier(.2,.7,.3,1) both;
+}
+.icon-grid.back { animation-name: step-in-back; }
+.icon-pick {
+  aspect-ratio: 1; display: grid; place-items: center; border: 0; border-radius: 14px; background: var(--surface); color: var(--ink);
+  cursor: pointer; box-shadow: 0 1px 2px rgb(30 43 69 / 6%); transition: transform .15s, background .15s; -webkit-tap-highlight-color: transparent;
+}
+.icon-pick:active { transform: scale(.92); }
+.icon-pick[aria-pressed='true'] { background: var(--primary); color: var(--on-primary); box-shadow: 0 4px 12px rgb(30 43 69 / 22%); }
+.icon-pick[aria-pressed='true'] .ic { --ic-accent: var(--gold); }
+
+/* Plan: a tab slides in from the side it was swiped from */
+.tab-pane { display: flex; flex-direction: column; gap: inherit; animation: step-in .28s cubic-bezier(.2,.7,.3,1) both; }
+.tab-pane.back { animation-name: step-in-back; }
+
+/* ======================================================================================================
+   Feels like an app, not a web page (with lib/appfeel.ts): nothing gets selected or dragged by a long
+   press, there's no grey tap flash or double-tap zoom, and everything tappable gives under the finger.
+   ====================================================================================================== */
+html { -webkit-tap-highlight-color: transparent; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+input, textarea, select, [contenteditable='true'], .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+img, svg, a { -webkit-user-drag: none; }
+a, button, [role='button'] { -webkit-touch-callout: none; }
+
+/* cards that open something sink a touch while pressed */
+.card-link, .manna-strip { transition: transform .18s cubic-bezier(.3,.8,.3,1), box-shadow .18s; }
+.card-link:active, .manna-strip:active { transform: scale(.985); }
+/* rows in a list light up behind the finger, edge to edge of the card */
+.list > li > :is(a, button).item:not(.hold-row) { position: relative; isolation: isolate; }
+.list > li > :is(a, button).item:not(.hold-row)::after {
+  content: ''; position: absolute; inset: 3px -10px; z-index: -1; border-radius: 14px; background: var(--sand);
+  opacity: 0; transition: opacity .25s;
+}
+.list > li > :is(a, button).item:not(.hold-row):active::after { opacity: .75; transition: none; }
+.wallet-acc { transition: transform .15s; }
+.wallet-acc:active { transform: scale(.96); }
+.chip:active, .seg > *:active { transform: scale(.96); }
+.chip, .seg > * { transition: transform .15s, background .2s, color .2s; }
+
+/* headers stay put while the page scrolls under them, like Activity; an edge shows once it moves */
+.page > .topbar, .page-head {
+  position: sticky; top: 0; z-index: 6;
+  margin: calc(-14px - var(--safe-t)) -16px 0; padding: calc(14px + var(--safe-t)) 16px 8px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  transition: box-shadow .25s;
+}
+.page-head { display: flex; flex-direction: column; gap: 12px; padding-bottom: 10px; }
+.page-head > .topbar { position: static; margin: 0; padding: 0; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+html.is-scrolled :is(.page > .topbar, .page-head) { box-shadow: 0 1px 0 var(--line), 0 8px 18px -14px rgb(30 43 69 / 30%); }
+
+/* ---------- the navy summary card, the same family as the wallet on Today and the month on Activity ---------- */
+.hero {
+  position: relative; overflow: hidden; border-radius: 24px; padding: 16px 18px 14px; color: #f6efe0;
+  background: radial-gradient(120% 90% at 100% 0%, rgb(224 165 68 / 22%), transparent 55%), linear-gradient(160deg, #24345a 0%, #1e2b45 55%, #172238 100%);
+  box-shadow: 0 10px 26px rgb(30 43 69 / 24%), inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+:root[data-theme='dark'] .hero { box-shadow: 0 10px 26px rgb(0 0 0 / 30%), inset 0 0 0 1px rgb(224 165 68 / 22%); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .hero { box-shadow: 0 10px 26px rgb(0 0 0 / 30%), inset 0 0 0 1px rgb(224 165 68 / 22%); } }
+/* a star of provision in the corner, like the one on the wallet */
+.hero::after {
+  content: ''; position: absolute; right: 16px; top: 14px; width: 20px; height: 20px; pointer-events: none; opacity: .85; background: #e0a544;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+}
+.hero .eyebrow { color: rgb(246 239 224 / 62%); }
+.hero-big { font-size: 34px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; margin-top: 4px; }
+.hero-mid { font-size: 26px; font-weight: 600; letter-spacing: -.015em; line-height: 1.15; margin-top: 2px; }
+.hero-of { font-size: 15px; font-weight: 500; letter-spacing: 0; color: rgb(246 239 224 / 66%); }
+.hero-sub { font-size: 13px; color: rgb(246 239 224 / 70%); margin-top: 2px; }
+.hero-meter { margin: 14px 0 8px; }
+.hero .bar { background: rgb(255 255 255 / 12%); }
+.hero .bar > span { background: #f6efe0; }
+.hero .bar > span.gold { background: #e0a544; }
+.hero .bar > span.bad { background: #f4a492; }
+.hero-foot { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: rgb(246 239 224 / 70%); margin-top: 8px; }
+.hero-foot .is-ok { color: #8fe0ad; font-weight: 600; }
+.hero-foot .is-warn { color: #f0c477; font-weight: 600; }
+.hero-row { display: flex; align-items: flex-end; gap: 12px; }
+.hero-side { text-align: right; padding-bottom: 2px; }
+.hero-in { color: #8fe0ad; font-weight: 600; font-size: 18px; }
+
+/* bars can mark where an even pace would be today */
+.bar.has-mark { position: relative; overflow: visible; }
+.bar-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; border-radius: 2px; background: var(--ink-2); opacity: .55; }
+.hero .bar-mark { background: #f6efe0; opacity: .7; }
+
+/* spent in categories with no budget: little pills instead of a run-on sentence */
+.unbudgeted { display: flex; flex-direction: column; gap: 8px; padding: 0 4px; }
+.unbudgeted .chips { gap: 6px; }
+.unbudgeted .pill { font-weight: 500; padding: 5px 10px; }
+.unbudgeted .pill .num { font-weight: 700; }
+
+/* Owed: both ways in one card, with how they weigh against each other */
+.owed-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.owed-right { padding-left: 14px; border-left: 1px solid rgb(255 255 255 / 10%); }
+.owed-hero .is-in { color: #8fe0ad; }
+.owed-hero .is-out { color: #f4a492; }
+.owed-hero::after { display: none; }
+.owed-split { display: flex; gap: 3px; height: 8px; margin-top: 14px; }
+.owed-split > span { min-width: 6px; border-radius: 99px; }
+.owed-split .in { background: #8fe0ad; }
+.owed-split .out { background: #f4a492; }
+
+/* Settings: a quiet red row to sign out */
+.item-danger { color: var(--bad); font-weight: 600; }
+
+/* ---------- Today: the manna strip under the camp ---------- */
+.manna-strip {
+  position: relative; overflow: hidden; display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 9px 12px 11px 9px;
+  border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+  color: inherit; text-decoration: none; font-size: 14px;
+}
+.manna-strip-icon { width: 34px; height: 34px; border-radius: 12px; display: grid; place-items: center; flex: none; background: var(--gold-soft); color: var(--gold-ink); }
+.manna-strip-icon .ic { --ic-accent: var(--gold); }
+.manna-strip-label { color: var(--ink-2); font-weight: 500; }
+.manna-strip-amt { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; }
+.manna-strip-amt strong { font-size: 16px; }
+.manna-strip-amt small { font-size: 12px; color: var(--ink-3); }
+/* how much manna is still on the ground, as a thin gold line along the foot */
+.manna-strip-meter { position: absolute; left: 0; bottom: 0; height: 3px; width: calc(var(--k) * 100%); background: var(--gold); border-radius: 0 3px 3px 0; transition: width .6s cubic-bezier(.3,.8,.3,1); }
+.manna-strip.is-over { background: var(--bad-soft); border-color: transparent; color: var(--bad); }
+.manna-strip.is-over .manna-strip-icon { background: rgb(255 255 255 / 40%); color: var(--bad); }

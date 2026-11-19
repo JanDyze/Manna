@@ -95,6 +95,8 @@ export type SceneProps = {
   onJar?: () => void
   /** folded down to a slim strip: just the sky and the greeting */
   collapsed?: boolean
+  /** a flick on the camp: up asks to fold it, down to open it (only at the top of the page) */
+  onFold?: (open: boolean) => void
   children?: ReactNode
 }
 
@@ -106,8 +108,9 @@ export type SceneProps = {
  * savings: provision laid up wisely (Proverbs 21:20). Quail come in at evening after payday (Exodus 16:13).
  * The palms are Elim's (Exodus 15:27). Layers drift apart a little as the page scrolls.
  */
-export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, collapsed = false, children }: SceneProps) {
+export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, collapsed = false, onFold, children }: SceneProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const flick = useRef<{ x: number; y: number; t: number } | null>(null)
   const [s0, s1, s2, far, near, sand, shade] = useMemo(() => palette(hour), [hour])
   const light = daylight(hour)
   const night = light < 0.25
@@ -148,7 +151,25 @@ export function Scene({ hour, manna, dry, pace = 0, jar, quail, festive, onJar, 
   const palmColour = night ? '#1c2438' : '#5e5a3c'
 
   return (
-    <div ref={ref} className={`scene scene-${phase}${darkSky ? ' scene-darksky' : ''}${dry ? ' is-dry' : ''}${collapsed ? ' is-collapsed' : ''}`}>
+    <div
+      ref={ref}
+      className={`scene scene-${phase}${darkSky ? ' scene-darksky' : ''}${dry ? ' is-dry' : ''}${collapsed ? ' is-collapsed' : ''}`}
+      onTouchStart={(e) => {
+        const p = e.touches[0]
+        flick.current = onFold && e.touches.length === 1 && window.scrollY < 4 ? { x: p.clientX, y: p.clientY, t: Date.now() } : null
+      }}
+      onTouchEnd={(e) => {
+        const f = flick.current
+        flick.current = null
+        if (!f || !onFold || Date.now() - f.t > 600) return
+        const p = e.changedTouches[0]
+        const dx = p.clientX - f.x
+        const dy = p.clientY - f.y
+        if (Math.abs(dy) < 44 || Math.abs(dy) < Math.abs(dx) * 1.5) return
+        if (dy < 0 && !collapsed) onFold(false)
+        else if (dy > 0 && collapsed) onFold(true)
+      }}
+    >
       <svg className="scene-art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
         <defs>
           <linearGradient id="sc-sky" x1="0" y1="0" x2="0" y2="1">

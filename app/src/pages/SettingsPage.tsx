@@ -9,7 +9,8 @@ import { goBack } from '../lib/back'
 import type { Account, AccountKind, Category, CategoryKind } from '../lib/types'
 import { balances, cardStatus, peso } from '../lib/money'
 import { ACCOUNT_ICON, ACCOUNT_KIND_LABEL, AccountMark, Tile, initials } from '../components/Bits'
-import { Glyph, PICKABLE } from '../components/Glyph'
+import { Glyph } from '../components/Glyph'
+import { IconPicker } from '../components/IconPicker'
 import { Sheet } from '../components/Sheet'
 import { MoneyField } from '../components/Pickers'
 import { useToast } from '../components/Toast'
@@ -158,33 +159,45 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <button className="btn soft" onClick={() => nav('/notes')}>
-        <Glyph name="pen" size={18} />
-        KATY’s notes
-      </button>
+      <section>
+        <p className="eyebrow" style={{ padding: '0 6px 8px' }}>More</p>
+        <ul className="card flush list">
+          {[
+            { icon: 'pen', title: 'KATY’s notes', sub: 'Things to remember, without moving money', go: () => nav('/notes') },
+            { icon: 'paid', title: 'Month-end balance check', sub: 'Count what you have and compare it with the record', go: () => nav('/check') },
+            { icon: 'sparkles', title: 'Walk through setup again', sub: 'Accounts, categories, budgets and the tithe', go: () => nav('/welcome') },
+            { icon: 'megaphone', title: 'What’s new', sub: `You’re on Manna ${APP_VERSION}`, go: () => setNews(true) },
+          ].map((r) => (
+            <li key={r.title}>
+              <button className="item" onClick={r.go}>
+                <Tile icon={r.icon} />
+                <div className="grow">
+                  <p className="item-title">{r.title}</p>
+                  <p className="item-sub">{r.sub}</p>
+                </div>
+                <Glyph name="fwd" size={18} className="faint" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      <button className="btn soft" onClick={() => nav('/check')}>
-        <Glyph name="check" size={18} />
-        Month-end balance check
-      </button>
-
-      <button className="btn soft" onClick={() => nav('/welcome')}>
-        <Glyph name="spark" size={18} />
-        Walk through setup again
-      </button>
-
-      {mock ? (
-        <a className="btn soft" href="/?mock=off">Leave demo mode</a>
-      ) : (
-        <button className="btn soft" onClick={() => supabase.auth.signOut()}>
-          <Glyph name="logout" size={18} />
-          Sign out
-        </button>
-      )}
-      <button className="version-line" onClick={() => setNews(true)}>
-        <span className="tiny faint">Manna {APP_VERSION} · for faithful stewards of daily provision</span>
-        <span className="tiny gold-link">What’s new</span>
-      </button>
+      <ul className="card flush list">
+        <li>
+          {mock ? (
+            <a className="item item-danger" href="/?mock=off">
+              <Tile icon="logout" tone="bad" />
+              <span className="grow item-title">Leave demo mode</span>
+            </a>
+          ) : (
+            <button className="item item-danger" onClick={() => supabase.auth.signOut()}>
+              <Tile icon="logout" tone="bad" />
+              <span className="grow item-title">Sign out</span>
+            </button>
+          )}
+        </li>
+      </ul>
+      <p className="tiny faint" style={{ textAlign: 'center' }}>Manna {APP_VERSION} · for faithful stewards of daily provision</p>
 
       {account && <AccountSheet account={account === 'new' ? null : account} onClose={() => setAccount(null)} />}
       {catKind && <CategoriesSheet kind={catKind} onClose={() => setCatKind(null)} />}
@@ -325,13 +338,7 @@ function CategoriesSheet({ kind, onClose }: { kind: CategoryKind; onClose: () =>
             <label htmlFor="c-name">Name</label>
             <input id="c-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} required />
           </div>
-          <div className="chips" role="group" aria-label="Icon">
-            {PICKABLE.map((p) => (
-              <button type="button" key={p} className="chip" style={{ padding: '0 10px' }} aria-pressed={icon === p} aria-label={p} onClick={() => setIcon(p)}>
-                <Glyph name={p} size={18} />
-              </button>
-            ))}
-          </div>
+          <IconPicker value={icon} onChange={setIcon} />
           {error && <p className="error" role="alert">{error}</p>}
           <div className="grid-2">
             <button type="button" className="btn soft" onClick={() => setEditing(null)}>Back</button>

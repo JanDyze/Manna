@@ -12,6 +12,7 @@ import { Mascot } from '../components/Mascot'
 import { TxAmount, txIcon, txTile } from '../components/Bits'
 import { Reorder } from '../components/Reorder'
 import { HoldRow } from '../components/HoldRow'
+import { useSwipe } from '../lib/swipe'
 import { EntrySheet } from '../components/EntrySheet'
 import { useToast } from '../components/Toast'
 
@@ -96,6 +97,7 @@ export function ActivityPage() {
   const totals = useMemo(() => monthTotals(data.transactions, month), [data.transactions, month])
   const kept = totals.income - totals.spent - totals.given
   const isNow = month === thisMonth()
+  const swipe = useSwipe(!isNow ? () => setMonth(shiftMonth(month, 1)) : undefined, () => setMonth(shiftMonth(month, -1)), !picking)
   const canArrange = !q && filter === 'all' && !picking
 
   // the open entry was deleted (or the link is old): drop it from the address quietly
@@ -199,7 +201,7 @@ export function ActivityPage() {
   }
 
   return (
-    <div className={`act${picking ? ' is-picking' : ''}`}>
+    <div className={`act${picking ? ' is-picking' : ''}`} {...swipe}>
       <header className={`act-head${compact ? ' is-compact' : ''}`}>
         {picking ? (
           <div className="act-top">

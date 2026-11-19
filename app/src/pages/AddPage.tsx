@@ -1,4 +1,5 @@
 import { useLayoutEffect, useMemo, useState, type CSSProperties, type FormEvent } from 'react'
+import { useSwipe } from '../lib/swipe'
 import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom'
 import { useStore } from '../lib/store'
 import type { CategoryKind, Tx, TxKind } from '../lib/types'
@@ -73,6 +74,8 @@ export function AddPage() {
   const [rise] = useState(() => !morphing())
   useLayoutEffect(() => settled(), [])
   const close = () => morph('close', () => goBack(nav))
+  // swiping moves between steps like the step bar does; forward still checks each step is filled in
+  const swipe = useSwipe(!last ? () => goTo(stepIx + 1) : undefined, stepIx > 0 ? () => goTo(stepIx - 1) : undefined)
 
   /** What's still missing on a step, if anything. */
   function missing(s: Step): string | null {
@@ -251,7 +254,7 @@ export function AddPage() {
   )
 
   return (
-    <form className={`page add-flow${rise ? ' rise' : ''}`} onSubmit={submit}>
+    <form className={`page add-flow${rise ? ' rise' : ''}`} onSubmit={submit} {...swipe}>
       <div className="topbar">
         {stepIx > 0 ? (
           <button type="button" className="icon-btn" aria-label="Back" onClick={() => goTo(stepIx - 1)}>

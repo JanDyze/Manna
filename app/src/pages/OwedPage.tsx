@@ -25,6 +25,8 @@ export function OwedPage() {
   const byMe = open.filter((d) => d.direction === 'i_owe')
   const sum = (ds: Debt[]) => ds.reduce((s, d) => s + debtLeft(d, data.transactions), 0)
   const people = (ds: Debt[]) => new Set(ds.map((d) => d.person_id)).size
+  const inSum = sum(toMe)
+  const outSum = sum(byMe)
 
   const row = (d: Debt) => {
     const left = debtLeft(d, data.transactions)
@@ -62,17 +64,30 @@ export function OwedPage() {
         </button>
       </div>
 
-      <section className="grid-2">
-        <div className="card quiet" style={{ background: 'var(--good-soft)' }}>
-          <p className="small good" style={{ fontWeight: 600 }}>Owed to you</p>
-          <p className="mid-num num good">{peso(sum(toMe))}</p>
-          <p className="tiny muted">{people(toMe)} {people(toMe) === 1 ? 'person' : 'people'}</p>
+      <section className="hero owed-hero">
+        <div className="owed-cols">
+          <div>
+            <p className="eyebrow">Owed to you</p>
+            <p className="hero-mid num is-in">{peso(inSum)}</p>
+            <p className="hero-sub">{people(toMe)} {people(toMe) === 1 ? 'person' : 'people'}</p>
+          </div>
+          <div className="owed-right">
+            <p className="eyebrow">You owe</p>
+            <p className="hero-mid num is-out">{peso(outSum)}</p>
+            <p className="hero-sub">{people(byMe)} {people(byMe) === 1 ? 'person' : 'people'}</p>
+          </div>
         </div>
-        <div className="card quiet" style={{ background: 'var(--bad-soft)' }}>
-          <p className="small bad" style={{ fontWeight: 600 }}>You owe</p>
-          <p className="mid-num num bad">{peso(sum(byMe))}</p>
-          <p className="tiny muted">{people(byMe)} {people(byMe) === 1 ? 'person' : 'people'}</p>
-        </div>
+        {inSum + outSum > 0 && (
+          <>
+            <div className="owed-split" aria-hidden="true">
+              <span className="in" style={{ flexGrow: inSum }} />
+              <span className="out" style={{ flexGrow: outSum }} />
+            </div>
+            <p className="hero-foot">
+              {inSum === outSum ? 'It evens out.' : inSum > outSum ? `${peso(inSum - outSum)} more is coming back to you than you owe` : `You owe ${peso(outSum - inSum)} more than is owed to you`}
+            </p>
+          </>
+        )}
       </section>
 
       {open.length === 0 && (

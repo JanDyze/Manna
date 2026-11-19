@@ -5,7 +5,8 @@ import { goalSaved, parseAmount, peso } from '../../lib/money'
 import { addMonths, daysBetween, endOfMonth, shortDate, today } from '../../lib/dates'
 import { DateField } from '../../components/DateField'
 import { Bar, Tile } from '../../components/Bits'
-import { Glyph, PICKABLE } from '../../components/Glyph'
+import { Glyph } from '../../components/Glyph'
+import { IconPicker } from '../../components/IconPicker'
 import { Mascot } from '../../components/Mascot'
 import { Sheet } from '../../components/Sheet'
 import { MoneyField } from '../../components/Pickers'
@@ -151,13 +152,7 @@ function GoalSheet({ goal, onClose }: { goal: Goal | null; onClose: () => void }
         />
         <div>
           <p className="label" style={{ marginBottom: 8 }}>Icon</p>
-          <div className="chips" role="group" aria-label="Icon">
-            {PICKABLE.filter((p) => ['jar', 'piggy', 'shield', 'gift', 'plane', 'laptop', 'home', 'school', 'heart', 'phone', 'transport', 'spark'].includes(p)).map((p) => (
-              <button type="button" key={p} className="chip" style={{ padding: '0 10px' }} aria-pressed={icon === p} aria-label={p} onClick={() => setIcon(p)}>
-                <Glyph name={p} size={18} />
-              </button>
-            ))}
-          </div>
+          <IconPicker value={icon} onChange={setIcon} />
         </div>
         {error && <p className="error" role="alert">{error}</p>}
         <button className="btn block">Save</button>

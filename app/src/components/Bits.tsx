@@ -6,11 +6,13 @@ import { Glyph } from './Glyph'
 export const ACCOUNT_ICON: Record<Account['kind'], string> = { cash: 'wallet', bank: 'bank', ewallet: 'phone', card: 'card', savings: 'piggy' }
 export const ACCOUNT_KIND_LABEL: Record<Account['kind'], string> = { cash: 'Cash', bank: 'Bank', ewallet: 'E-wallet', card: 'Card / pay later', savings: 'Savings' }
 
-export function Bar({ pct, tone, thick, label }: { pct: number; tone?: 'gold' | 'good' | 'bad'; thick?: boolean; label?: string }) {
+export function Bar({ pct, tone, thick, label, mark }: { pct: number; tone?: 'gold' | 'good' | 'bad'; thick?: boolean; label?: string; mark?: number }) {
   const w = Math.max(0, Math.min(100, pct))
   return (
-    <div className={`bar${thick ? ' thick' : ''}`} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
+    <div className={`bar${thick ? ' thick' : ''}${mark != null ? ' has-mark' : ''}`} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
       <span className={tone} style={{ width: `${w}%` }} />
+      {/* where spending would be today at an even pace through the month */}
+      {mark != null && <i className="bar-mark" style={{ left: `${Math.max(0, Math.min(100, mark))}%` }} aria-hidden="true" />}
     </div>
   )
 }

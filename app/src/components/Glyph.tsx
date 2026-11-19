@@ -1,5 +1,6 @@
 // Icons: Manna's own animated set (icons.ts, icons.css) first, then plain stroke icons for UI basics.
 import { ICON_MARKUP } from './icons'
+import { ICON_GROUPS, MORE_MARKUP } from './icons-more'
 
 const PATHS: Record<string, string> = {
   "home": "M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z",
@@ -77,11 +78,11 @@ const PATHS: Record<string, string> = {
 
 export const GLYPHS = Object.keys(PATHS)
 
-/** Icons a category or goal can use, in the order the pickers show them. */
-export const PICKABLE = ['food', 'coffee', 'transport', 'bolt', 'home', 'basket', 'heart', 'people', 'bag', 'spark', 'repeat', 'school', 'phone', 'gift', 'plane', 'laptop', 'shield', 'piggy', 'briefcase', 'tool', 'wheat', 'envelope', 'globe', 'hands', 'wallet', 'bank', 'card', 'dot']
+/** Icons a category or goal can use, in the order the picker shows them (IconPicker groups them). */
+export const PICKABLE = ICON_GROUPS.flatMap((g) => g.icons)
 
 export function Glyph({ name, size = 20, stroke = 1.8, className }: { name: string; size?: number; stroke?: number; className?: string }) {
-  const own = ICON_MARKUP[name]
+  const own = ICON_MARKUP[name] ?? MORE_MARKUP[name]
   const cls = `ic ic-${name}${className ? ` ${className}` : ''}`
   if (own)
     return (

@@ -18,6 +18,20 @@ export type Release = {
  */
 export const RELEASES: Release[] = [
   {
+    version: '0.3.0',
+    date: '2026-11-19',
+    title: 'Feels like an app now',
+    notes: [
+      { icon: 'thumbs', text: 'Holding a button or a card no longer brings up the browser’s menu or selects text, and everything gives a little under your finger.' },
+      { icon: 'list', text: 'Plan, Owed, Settings and the other pages keep their title at the top while you scroll.' },
+      { icon: 'growth', text: 'Plan and Owed open with a navy summary, and each budget marks where an even pace would be today.' },
+      { icon: 'wheat', text: 'Today shows the manna left this month in its own strip. Flick the camp up to fold it, pull it down to open it again.' },
+      { icon: 'sparkles', text: '93 new animated icons for categories and goals: jeepney, rice, milk tea, church, paw and many more, in a picker grouped by kind.' },
+      { icon: 'repeat', text: 'Swipe sideways to move between Plan’s tabs, the steps of a new entry, setup, and Activity’s months.' },
+      { icon: 'chat', text: 'The keyboard no longer covers what you’re typing in, and drawers stay still behind your finger.' },
+    ],
+  },
+  {
     version: '0.2.0',
     date: '2026-11-19',
     title: 'Activity got a fresh coat',
