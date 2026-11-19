@@ -4,7 +4,7 @@
  *   pages    – network first, falling back to the cached app shell when offline
  *   /assets/ – cache first; Vite gives these hashed names, so a cached copy never goes stale
  *   the rest – served from cache and refreshed in the background
- * Requests to other origins (Supabase) and anything but GET go straight to the network untouched.
+ * Requests to other origins (Supabase), /version.json and anything but GET go straight to the network untouched.
  * Bump VERSION to drop every old cache on the next visit.
  */
 const VERSION = 'manna-v1'
@@ -28,6 +28,8 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
   if (request.method !== 'GET' || url.origin !== self.location.origin) return
+  // the app asks this to learn whether a newer copy is out, so it must never come from the cache
+  if (url.pathname === '/version.json') return
 
   if (request.mode === 'navigate') {
     event.respondWith(

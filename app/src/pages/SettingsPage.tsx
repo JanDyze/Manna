@@ -14,6 +14,8 @@ import { Sheet } from '../components/Sheet'
 import { MoneyField } from '../components/Pickers'
 import { useToast } from '../components/Toast'
 import { ConnectClaudeSheet } from '../components/ConnectClaude'
+import { WhatsNewSheet } from '../components/WhatsNew'
+import { APP_VERSION, RELEASES } from '../lib/version'
 
 export function SettingsPage() {
   const store = useStore()
@@ -24,6 +26,7 @@ export function SettingsPage() {
   const [account, setAccount] = useState<Account | 'new' | null>(null)
   const [catKind, setCatKind] = useState<CategoryKind | null>(null)
   const [claude, setClaude] = useState(false)
+  const [news, setNews] = useState(false)
   const [theme, setTheme] = useState<ThemePref>(getThemePref())
   const [tithe, setTithe] = useState(String(data.settings.tithe_percent))
   const bal = useMemo(() => balances(data.accounts, data.transactions), [data.accounts, data.transactions])
@@ -164,11 +167,15 @@ export function SettingsPage() {
           Sign out
         </button>
       )}
-      <p className="tiny faint" style={{ textAlign: 'center' }}>Manna · for faithful stewards of daily provision</p>
+      <button className="version-line" onClick={() => setNews(true)}>
+        <span className="tiny faint">Manna {APP_VERSION} · for faithful stewards of daily provision</span>
+        <span className="tiny gold-link">What’s new</span>
+      </button>
 
       {account && <AccountSheet account={account === 'new' ? null : account} onClose={() => setAccount(null)} />}
       {catKind && <CategoriesSheet kind={catKind} onClose={() => setCatKind(null)} />}
       {claude && <ConnectClaudeSheet onClose={() => setClaude(false)} />}
+      {news && <WhatsNewSheet releases={RELEASES} onClose={() => setNews(false)} />}
     </div>
   )
 }

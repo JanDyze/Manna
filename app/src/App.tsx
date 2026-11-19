@@ -7,6 +7,7 @@ import { Layout } from './components/Layout'
 import { Mascot } from './components/Mascot'
 import { LogoAnimated } from './components/LogoAnimated'
 import { ToastProvider } from './components/Toast'
+import { Updates } from './components/WhatsNew'
 import { AuthPage } from './pages/AuthPage'
 import { TodayPage } from './pages/TodayPage'
 import { AddPage } from './pages/AddPage'
@@ -92,6 +93,7 @@ function Ready() {
   // first run: set up before anything else (the defaults are already there, so Skip is safe)
   if (!data.settings.onboarded_at) return <OnboardingPage />
   return (
+    <>
     <Routes>
       <Route path="/welcome" element={<OnboardingPage again />} />
       <Route path="/add" element={<AddPage />} />
@@ -109,6 +111,8 @@ function Ready() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    <Updates />
+    </>
   )
 }
 

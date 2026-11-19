@@ -58,11 +58,9 @@ export function MascotChat({ onClose, photo: startPhoto }: { onClose: () => void
   useEffect(() => {
     const key = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', key)
-    document.body.style.overflow = 'hidden'
     input.current?.focus({ preventScroll: true })
     return () => {
       document.removeEventListener('keydown', key)
-      document.body.style.overflow = ''
       rec.current?.stop()
     }
   }, [onClose])

@@ -13,6 +13,7 @@ import { BRANDS, brandFor } from '../lib/banks'
 import { useToast } from '../components/Toast'
 import { Speech } from '../components/Speech'
 import { onSoundChange, setSoundOn, soundOn } from '../lib/chatter'
+import { markVersionSeen } from '../lib/version'
 
 /** Monthly amounts offered for the obvious categories; the person changes or clears them. */
 const SUGGESTED: Record<string, number> = { Food: 6000, Transport: 2500, Bills: 3000, Groceries: 4000 }
@@ -145,6 +146,8 @@ export function OnboardingPage({ again = false }: { again?: boolean }) {
         ...(!skip && Number.isFinite(pct) && pct >= 0 && pct <= 100 ? { tithe_percent: pct } : {}),
         onboarded_at: data.settings.onboarded_at ?? new Date().toISOString(),
       })
+      // someone just starting has nothing to compare against: no "what's new" for them
+      if (!data.settings.onboarded_at) markVersionSeen()
       if (again) {
         toast('Setup saved', 'happy')
         nav('/settings', { replace: true })

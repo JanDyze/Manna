@@ -9,10 +9,8 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
     document.addEventListener('keydown', key)
     const first = ref.current?.querySelector<HTMLElement>('input, select, textarea, button')
     first?.focus({ preventScroll: true })
-    document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', key)
-      document.body.style.overflow = ''
       prev?.focus?.({ preventScroll: true })
     }
   }, [onClose])

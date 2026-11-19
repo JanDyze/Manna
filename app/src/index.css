@@ -1065,8 +1065,18 @@ html.vt-add-close::view-transition-old(root) { z-index: 1; animation: add-grow .
 }
 .pick-actions button:active { background: rgb(255 255 255 / 10%); }
 .pick-actions .ic { --ic-accent: var(--gold); }
-.pick-actions .is-danger { color: #f4a492; }
-.pick-actions .is-armed { background: var(--bad); color: #fff; animation: armed .3s; }
+/* Delete has to read on the navy bar by day and on the gold bar by night */
+.pick-bar { --pick-danger: #f4a492; --pick-armed: #b4432f; }
+:root[data-theme='dark'] .pick-bar { --pick-danger: #8a2414; --pick-armed: #8a2414; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .pick-bar { --pick-danger: #8a2414; --pick-armed: #8a2414; } }
+.pick-actions .is-danger { color: var(--pick-danger); background: color-mix(in srgb, var(--pick-danger) 16%, transparent); }
+.pick-actions .is-armed { background: var(--pick-armed); color: #fff; animation: armed .3s; }
+/* small phones: let the buttons tighten so Delete never slips off the end */
+@media (max-width: 380px) {
+  .pick-bar { padding-left: 14px; gap: 4px; }
+  .pick-actions button { min-width: 46px; padding: 0 4px; }
+  .pick-net { font-size: 16px; }
+}
 @keyframes armed { 30% { transform: translateX(-3px); } 60% { transform: translateX(3px); } }
 
 /* ---------- one entry, as a paper receipt ---------- */
@@ -1115,3 +1125,33 @@ html.vt-add-close::view-transition-old(root) { z-index: 1; animation: add-grow .
 .entry-actions .btn.soft { flex: none; }
 /* the pick bar stands in for the tab bar */
 body:has(.pick-bar) .nav { opacity: 0; pointer-events: none; transform: translate(-50%, 12px); }
+
+/* ---------- versions: what's new, and a newer copy ready ---------- */
+.news-hello { display: flex; align-items: center; gap: 10px; margin: -6px 0 6px; }
+.news-hello .hand { font-size: 24px; line-height: 1.15; color: var(--gold-ink); }
+.news { display: flex; flex-direction: column; gap: 18px; margin-bottom: 18px; }
+.news-head { display: flex; align-items: center; gap: 8px; }
+.news-title { font-weight: 600; margin-top: 8px; }
+.news-notes > li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; line-height: 1.4; }
+.news-notes .tile { flex: none; width: 36px; height: 36px; border-radius: 12px; }
+.news-notes .tile .ic { --ic-accent: var(--gold); }
+.version-line { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px; border: 0; background: none; cursor: pointer; font: inherit; color: inherit; }
+.gold-link { color: var(--gold-ink); font-weight: 600; }
+.update-bar {
+  position: fixed; left: 50%; top: calc(10px + var(--safe-t)); translate: -50% 0; z-index: 45;
+  width: min(496px, calc(100% - 20px)); display: flex; align-items: center; gap: 10px; padding: 6px 4px 6px 16px;
+  background: var(--primary); color: var(--on-primary); border-radius: 20px; box-shadow: 0 12px 30px rgb(30 43 69 / 30%);
+  font-weight: 500; animation: update-in .35s cubic-bezier(.3,1.3,.5,1);
+}
+.update-bar > svg { flex: none; }
+.update-bar .icon-btn { color: inherit; }
+/* the bar is navy by day and gold by night, so its button takes the opposite colours */
+.update-bar .btn { background: var(--on-primary); color: var(--primary); }
+@keyframes update-in { from { opacity: 0; translate: -50% -14px; } }
+
+/* ---------- while a drawer is open, nothing behind it scrolls: not the page, not Activity's own list ---------- */
+html:has(.sheet-backdrop), html:has(.sheet-backdrop) body { overflow: hidden; }
+html:has(.sheet-backdrop) [data-scroller] { overflow: hidden; }
+.sheet-backdrop { touch-action: none; }
+/* scrolling to the end of a long drawer stops there instead of carrying on into the page */
+.sheet { overscroll-behavior: contain; }
