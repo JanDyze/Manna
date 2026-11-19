@@ -23,19 +23,29 @@ function StarPlus() {
   )
 }
 
-/** True once the page is scrolled to its end (or is too short to scroll). */
+/**
+ * True once the page is scrolled to its end (or is too short to scroll). A page that scrolls inside itself
+ * (Activity keeps its header still) marks its scrolling part with data-scroller, and that's what counts.
+ */
 function useAtEnd(pathname: string) {
   const [atEnd, setAtEnd] = useState(false)
   useEffect(() => {
-    const check = () => setAtEnd(window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4)
+    const inner = () => document.querySelector<HTMLElement>('[data-scroller]')
+    const check = () => {
+      const el = inner()
+      setAtEnd(el ? el.scrollTop + el.clientHeight >= el.scrollHeight - 4 : window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4)
+    }
     check()
-    window.addEventListener('scroll', check, { passive: true })
+    // scroll doesn't bubble, but it can be caught on the way down: this hears the inner list too
+    document.addEventListener('scroll', check, { passive: true, capture: true })
     window.addEventListener('resize', check)
     // pages grow when data arrives, without any scrolling
     const grow = new ResizeObserver(check)
     grow.observe(document.body)
+    const list = inner()?.firstElementChild
+    if (list) grow.observe(list)
     return () => {
-      window.removeEventListener('scroll', check)
+      document.removeEventListener('scroll', check, { capture: true })
       window.removeEventListener('resize', check)
       grow.disconnect()
     }
