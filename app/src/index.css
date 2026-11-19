@@ -1018,7 +1018,10 @@ html.vt-add-close::view-transition-old(root) { z-index: 1; animation: add-grow .
 
 /* a row you can tap or press and hold: no browser link menu, no text selection, a fill that grows while held */
 .hold-row { position: relative; cursor: pointer; font: inherit; color: inherit; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: pan-y; isolation: isolate; }
-.hold-row .grow > span { display: block; }
+/* title over the line under it, whether the row is tappable or being arranged (Reorder draws its own rows) */
+.hold-row .grow > span, .reorder .item .grow > span { display: block; }
+/* while arranging, a row is just its name and where it goes: the amount steps aside for the handle */
+.reorder .item .row-end { display: none; }
 .hold-row::after {
   content: ''; position: absolute; inset: 4px -10px; z-index: -1; border-radius: 14px; background: var(--sand);
   transform: scaleX(0); transform-origin: left; opacity: 0; transition: transform .15s, opacity .15s;
