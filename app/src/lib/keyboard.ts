@@ -34,20 +34,34 @@ export function watchKeyboard() {
 
   function measure() {
     if (!vv) return
-    const kb = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop))
+    // Things pinned to the bottom of the screen sit at the bottom of the layout viewport. Measure against that,
+    // not window.innerHeight: on Android Chrome innerHeight already shrinks with the keyboard, which made the
+    // keyboard look zero tall and left drawers underneath it. (iOS keeps innerHeight; the larger of the two is
+    // the layout height either way.)
+    const layout = Math.max(root.clientHeight, window.innerHeight)
+    const kb = Math.max(0, Math.round(layout - vv.height - vv.offsetTop))
     root.style.setProperty('--kb', `${kb}px`)
     root.style.setProperty('--vvh', `${Math.round(vv.height)}px`)
   }
 
-  /** Bring the focused field into the visible band, keeping its top in view if it's taller than the band. */
+  /**
+   * Bring the focused field into the visible band, keeping its top in view if it's taller than the band. In a
+   * form, the button that saves it comes along too when both fit, so it can be tapped without closing the keyboard.
+   */
   function reveal() {
     const el = document.activeElement
     if (!isField(el)) return
     const top = (vv?.offsetTop ?? 0) + GAP
     const bottom = (vv ? vv.offsetTop + vv.height : window.innerHeight) - GAP
     const r = el.getBoundingClientRect()
+    let want = r.bottom
+    const save = el.closest('form')?.querySelector<HTMLElement>('button[type="submit"], button:not([type])')
+    if (save) {
+      const s = save.getBoundingClientRect()
+      if (s.bottom > r.bottom && s.bottom - r.top <= bottom - top) want = s.bottom
+    }
     let dy = 0
-    if (r.bottom > bottom) dy = Math.min(r.bottom - bottom, r.top - top)
+    if (want > bottom) dy = Math.min(want - bottom, r.top - top)
     else if (r.top < top) dy = r.top - top
     if (Math.abs(dy) < 2) return
     scrollerOf(el).scrollBy({ top: dy, behavior: 'smooth' })
